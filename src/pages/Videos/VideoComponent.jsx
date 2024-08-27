@@ -3,7 +3,6 @@ import { Row, Col, Image } from "antd";
 import React, { useState, useEffect } from "react";
 import VideoModal from "./VideoModal";
 import axios from "axios";
-import { videosData } from "../../textFile";
 
 const VideoContainer = styled.div`
   VideoModal {
@@ -43,18 +42,18 @@ function VideoComponent() {
 
   const getVideosData = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:8000/api/videos/");
-
-      // const response = await axios.get(`${apiUrl}/videos/`);
+      const response = await axios.get(`${apiUrl}information/videos/`);
       console.log(response.data);
-      setVideosData(response.data);
+      setVideosData(response.data.videos);
     } catch (error) {
       console.log(error);
     }
   };
+
   useEffect(() => {
     getVideosData();
   }, []);
+
   return (
     <VideoContainer>
       {videosData.map((video) => (
@@ -77,10 +76,7 @@ function VideoComponent() {
                   {video.date} - {video.place}
                 </h5>
 
-                <p>
-                  Lorem ipsum, dolor sit amet consectetur adipisicing elit. Soluta nemo consequuntur
-                  facere eaque laudantium? Numquam, sdam.
-                </p>
+                <p>{video.description}</p>
               </LinkStyle>
             </Col>
           </Row>

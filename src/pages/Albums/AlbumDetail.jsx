@@ -1,37 +1,49 @@
 import { Image, Row } from "antd";
 import TitleComponent from "../../components/TitleComponent";
-import { albumsData } from "../../textFile";
-import { useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import styled from "styled-components";
 
-const Album = () => (
-  <Image.PreviewGroup
-    items={[
-      "https://gw.alipayobjects.com/zos/antfincdn/LlvErxo8H9/photo-1503185912284-5271ff81b9a8.webp",
-      "https://gw.alipayobjects.com/zos/antfincdn/cV16ZqzMjW/photo-1473091540282-9b846e7965e3.webp",
-      "https://gw.alipayobjects.com/zos/antfincdn/x43I27A55%26/photo-1438109491414-7198515b166b.webp",
-    ]}
-  >
-    <Image
-      width={200}
-      src="https://gw.alipayobjects.com/zos/antfincdn/LlvErxo8H9/photo-1503185912284-5271ff81b9a8.webp"
-    />
-  </Image.PreviewGroup>
-);
+const AlbumStyle = styled.div`
+  .photo {
+    padding: 10px;
+  }
+`;
 
 function AlbumDetail() {
-  const location = useLocation();
-  const pathSnippets = location.pathname.split("/").filter((i) => i);
-  const albumIndex = pathSnippets[1] - 1;
-  const albumData = albumsData[albumIndex];
-  const [dataSource, setDataSource] = useState(albumData.images);
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const [albumDetail, setAlbumDetail] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  const { albumId } = useParams();
+  const getAlbumsData = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}information/albums/${albumId}/`);
+      console.log(response.data);
+      setAlbumDetail(response.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false); // 数据加载完成后或请求出错后设置 loading 为 false
+    }
+  };
+  useEffect(() => {
+    getAlbumsData();
+  }, [albumId]);
+  if (loading) {
+    return <div>Loading...</div>;
+  }
   return (
-    <>
+    <AlbumStyle>
       <Row style={{ textAlign: "center", justifyContent: "center" }}>
-        <TitleComponent label={`| ${albumData.title} |`} />
+        <TitleComponent label={`| ${albumDetail.title} |`} />
       </Row>
-      <Album />
-    </>
+      {albumDetail.photos &&
+        albumDetail.photos.map((photo) => (
+          <Image className="photo" preview={false} width={200} src={photo.image} />
+        ))}
+    </AlbumStyle>
   );
 }
 export default AlbumDetail;

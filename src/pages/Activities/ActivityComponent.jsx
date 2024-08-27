@@ -1,7 +1,9 @@
 import styled from "styled-components";
 import { Row, Col, Button, Flex } from "antd";
-import React from "react";
+import React, { Fragment } from "react";
 import { Link } from "react-router-dom";
+import DOMPurify from "dompurify"; //清理HTML
+
 // import { activitiesData } from "../../../textFile";
 
 const ActivityContainer = styled.div`
@@ -30,8 +32,8 @@ function ActivityComponent({ activitiesData }) {
     <ActivityContainer>
       {activitiesData.map((activity) => {
         return (
-          <StyleLink to={`/activities/${activity.id}`}>
-            <Row gutter={30} key={activity.index}>
+          <StyleLink to={`/activities/${activity.id}`} key={activity.id}>
+            <Row gutter={30}>
               <Col span={8}>
                 <img src={activity.poster} alt="" />
               </Col>

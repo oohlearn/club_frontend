@@ -3,9 +3,11 @@ import { Link } from "react-router-dom";
 import { Card, Col, ConfigProvider, Row, Select, Space, Flex, Divider, Button } from "antd";
 import styled from "styled-components";
 import { productsData2 } from "../../textFile";
+import DOMPurify from "dompurify"; //清理HTML
 const StyleLink = styled(Link)`
   text-decoration: none;
 `;
+// TODO Get 商品資訊
 
 const { Meta } = Card;
 const selectOptions = Array.from({ length: 11 }, (_, i) => ({ value: i, label: i }));

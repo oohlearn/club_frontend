@@ -4,6 +4,7 @@ import NewsComponent from "../News/NewsComponent";
 import SearchBar from "../../components/SearchBar";
 import TitleComponent from "../../components/TitleComponent";
 
+// TODO Get News
 function News() {
   return (
     <>

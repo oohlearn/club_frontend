@@ -8,6 +8,8 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { useState, useEffect } from "react";
 
+// TODO get
+// TODO ticket
 const StylePagination = styled.div`
   display: flex;
   justify-content: center;
@@ -20,10 +22,7 @@ function Activities() {
 
   const getVideosData = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:8000/api/activities/");
-
-      // const response = await axios.get(`${apiUrl}/videos/`);
-      console.log(response.data);
+      const response = await axios.get(`${apiUrl}activities/`);
       setActivitiesData(response.data);
     } catch (error) {
       console.log(error);

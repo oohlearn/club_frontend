@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button, List, Skeleton, Col, Flex, Row } from "antd";
 
+// TODO Get MainArticle
 function MainArticle({ latestNews }) {
   // const [btnText, setBtnText] = useState("更多資訊");
   // if (latestNews["category"] === "ticket") {

@@ -123,7 +123,7 @@ function PolicyCheck() {
       <Button type="link" onClick={showLoading}>
         服務條款與隱私權政策
       </Button>
-      <PolicyModal loading={loading} setOpen={setOpen} open={open}></PolicyModal>
+      <PolicyModal loading={loading} setOpen={setOpen} open={open} />
     </Checkbox>
   );
 }

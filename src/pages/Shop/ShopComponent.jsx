@@ -1,24 +1,72 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Card, Col, ConfigProvider, Row, Select, Space, Flex, Divider, Button } from "antd";
 import styled from "styled-components";
-import { productsData2 } from "../../textFile";
 import DOMPurify from "dompurify"; //清理HTML
-const StyleLink = styled(Link)`
-  text-decoration: none;
+import axios from "axios";
+import AddToCartModal from "./AddToCartModal";
+
+const ListStyle = styled.div`
+  .link {
+    text-decoration: none;
+    text-align: start;
+  }
+  .cartIcon {
+    height: 25px;
+    width: 25px;
+  }
+  .title {
+    font-weight: 700;
+  }
 `;
-// TODO Get 商品資訊
+
+function OpenAddModal({ product }) {
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const showLoading = () => {
+    setOpen(true);
+    setLoading(true);
+
+    // Simple loading mock. You should add cleanup logic in real world.
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  };
+  return (
+    <>
+      <Button type="link" onClick={showLoading} style={{ borderRadius: "5px", margin: "5px" }}>
+        <img src="images/cart.png" className="cartIcon" />
+      </Button>
+      <AddToCartModal product={product} loading={loading} setOpen={setOpen} open={open} />
+    </>
+  );
+}
 
 const { Meta } = Card;
 const selectOptions = Array.from({ length: 11 }, (_, i) => ({ value: i, label: i }));
 
 function ProductComponent() {
+  const [productsData, setProductsData] = useState([]);
+  const apiUrl = process.env.REACT_APP_API_URL;
+
+  const getProductsData = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}shopping/products/`);
+      console.log(response.data);
+      setProductsData(response.data.products);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    getProductsData();
+  }, []);
   return (
-    <>
-      <Row justify={"start"}>
-        {productsData2.map((product) => (
-          <Col key={product.index}>
-            <StyleLink to={`/shop/${product.index}`}>
+    <ListStyle>
+      <Row justify="space-around">
+        {productsData.map((product) => (
+          <Link className="link" to={`/shop/${product.id}`}>
+            <Col key={product.id} span={12}>
               <ConfigProvider
                 theme={{
                   token: {
@@ -30,38 +78,37 @@ function ProductComponent() {
                 <Card
                   hoverable
                   style={{
-                    width: 110,
-                    padding: 5,
+                    width: 150,
+                    padding: 3,
                   }}
                   cover={
                     <img
                       alt="example"
-                      src={product.img}
+                      src={product.index_image}
                       style={{
-                        width: 100,
-                        height: 100,
+                        width: 150,
+                        height: 180,
                         objectFit: "contain",
                       }}
                     />
                   }
                 >
-                  <Meta
-                    title={product.title}
-                    style={{
-                      textAlign: "start",
-                    }}
-                  />
-                  <Meta description={`NT$${product.price}`} />
-                  <Button type="default" style={{ borderRadius: "5px", paddingTop: "2px" }}>
-                    加入購物車
-                  </Button>
+                  <Row>
+                    <Col span={18}>
+                      <Meta title={<h6 className="title">{product.title}</h6>} />
+                      <Meta description={<h6>NT$${product.price}</h6>} />
+                    </Col>
+                    <Col span={6}>
+                      <OpenAddModal product={product} />
+                    </Col>
+                  </Row>
                 </Card>
               </ConfigProvider>
-            </StyleLink>
-          </Col>
+            </Col>
+          </Link>
         ))}
       </Row>
-    </>
+    </ListStyle>
   );
 }
 
@@ -130,10 +177,10 @@ function ShopComponent() {
   return (
     <>
       <Flex>
-        <Col span={12}>
+        <Col span={18}>
           <ProductComponent />
         </Col>
-        <Col span={10}>
+        {/* <Col span={10}>
           <ShoppingList />
           <Flex justify="end" gap="large">
             <Link to="/activities">
@@ -143,7 +190,7 @@ function ShopComponent() {
               <Button type="primary">結帳囉！</Button>
             </Link>
           </Flex>
-        </Col>
+        </Col> */}
       </Flex>
     </>
   );

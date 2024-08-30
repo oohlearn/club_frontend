@@ -16,7 +16,8 @@ import NewsDetail from "./pages/News/NewsDetail";
 import Contact from "./pages/Contact";
 import Shop from "./pages/Shop/ShopPage";
 import ChooseSeats from "./pages/Order/ChooseSeats";
-import Checkout from "./pages/Shop/Checkout";
+import Checkout from "./pages/Order/Checkout";
+import ProductDetail from "./pages/Shop/ProductDetail";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
             <Route path="conductors" element={<Conductors />}></Route>
             <Route path="teachers" element={<Teachers />}></Route>
           </Route>
+          {/* sidebar */}
           <Route path="activities" element={<Activities />}></Route>
           <Route path="activities/:activityId" element={<ActivityTicket />}></Route>
           <Route path="activities/:activityId/choose_seats" element={<ChooseSeats />}></Route>
@@ -41,6 +43,7 @@ function App() {
           {/* Navbar */}
           <Route path="contact" element={<Contact />}></Route>
           <Route path="shop" element={<Shop />}></Route>
+          <Route path="shop/:productId" element={<ProductDetail />}></Route>
           <Route path="shop/checkout" element={<Checkout />}></Route>
         </Route>
       </Routes>

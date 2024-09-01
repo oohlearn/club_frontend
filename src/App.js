@@ -3,7 +3,7 @@ import Home from "./pages/Homepage/Home";
 import FrontLayout from "./pages/FontLayout";
 import IntroPage from "./pages/Intro/Intro";
 import Activities from "./pages/Activities/ActivitiesPage";
-import ActivityTicket from "./pages/Activities/ActivityTicket";
+import ActivityDetail from "./pages/Activities/ActivityDetail";
 import IntroHome from "./pages/Intro/IntroHome";
 import ExperiencesPage from "./pages/Intro/Experiences";
 import Conductors from "./pages/Intro/Conductors";
@@ -33,8 +33,8 @@ function App() {
           </Route>
           {/* sidebar */}
           <Route path="activities" element={<Activities />}></Route>
-          <Route path="activities/:activityId" element={<ActivityTicket />}></Route>
-          <Route path="activities/:activityId/choose_seats" element={<ChooseSeats />}></Route>
+          <Route path="activities/:eventId" element={<ActivityDetail />}></Route>
+          <Route path="activities/:eventId/choose_seats" element={<ChooseSeats />}></Route>
           <Route path="videos" element={<Videos />}></Route>
           <Route path="albums" element={<Albums />}></Route>
           <Route path="albums/:albumId" element={<AlbumDetail />}></Route>

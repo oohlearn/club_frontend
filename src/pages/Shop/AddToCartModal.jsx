@@ -37,6 +37,8 @@ const AddToCartModal = ({ loading, setOpen, open, product }) => {
         loading={loading}
         open={open}
         onCancel={() => setOpen(false)}
+        okText="加入購物車"
+        cancelText="關閉視窗"
       >
         <Image preview={false} width={200} src={product.index_image} />
         <h3>{product.title}</h3>
@@ -58,7 +60,7 @@ const AddToCartModal = ({ loading, setOpen, open, product }) => {
         <br />
         <Row
           style={{
-            display: product.size_list ? "block" : "none",
+            display: product.size_list.length > 0 ? "block" : "none",
             color: "orange",
             fontWeight: "bold",
           }}

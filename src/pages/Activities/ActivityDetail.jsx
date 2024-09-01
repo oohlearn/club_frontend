@@ -2,10 +2,11 @@ import { Col, Row, Space, Divider, Table, Button, Select, Checkbox } from "antd"
 import { QuestionCircleTwoTone } from "@ant-design/icons";
 import TitleComponent from "../../components/TitleComponent";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import SeatsImage from "../../components/SeatsImage";
 import axios from "axios";
+import DOMPurify from "dompurify"; //清理HTML
 
 const selectOptions = Array.from({ length: 10 }, (_, i) => ({ value: i + 1, label: i + 1 }));
 
@@ -13,8 +14,8 @@ const TicketTable = ({ dataSource, handleTicketChange, resetTicketCounts }) => {
   const columns = [
     {
       title: "種類",
-      dataIndex: "category",
-      key: "category",
+      dataIndex: "name",
+      key: "name",
       render: (text) => <a>{text}</a>,
     },
     {
@@ -23,9 +24,9 @@ const TicketTable = ({ dataSource, handleTicketChange, resetTicketCounts }) => {
       key: "price",
     },
     {
-      title: "優惠說明",
-      dataIndex: "discount",
-      key: "discount",
+      title: "說明",
+      dataIndex: "help_words",
+      key: "help_words",
     },
     {
       title: (
@@ -44,7 +45,7 @@ const TicketTable = ({ dataSource, handleTicketChange, resetTicketCounts }) => {
           style={{ width: 120 }}
           options={selectOptions}
           value={record.ticket_amount}
-          onChange={(value) => handleTicketChange(record.key, value)}
+          onChange={(value) => handleTicketChange(record.name, value)}
           disabled={record.disabled}
         />
       ),
@@ -117,35 +118,36 @@ const ProgramTable = ({ programData }) => {
     />
   );
 };
-function ActivityTicket() {
-  const location = useLocation();
-  const pathSnippets = location.pathname.split("/").filter((i) => i);
-  const activityId = pathSnippets[1];
-  const [activityData, setActivityData] = useState({});
-  const [dataSource, setDataSource] = useState(activityData.ticket);
-  const [newOrder, setNewOrder] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    ticket: {},
-    product: [],
-  });
-  const [orderList, setOrderList] = useState([]);
+function ActivityDetail() {
+  const { eventId } = useParams();
+  const [eventData, setEventData] = useState({});
+  const [dataSource, setDataSource] = useState([]);
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const [loading, setLoading] = useState(true);
 
-  const getActivityData = async () => {
-    const response = await axios.get(`http://127.0.0.1:8000/api/activities/${activityId}/`);
-    console.log(response);
-    setActivityData(response.data);
+  const getEventData = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}activity/events/${eventId}/`);
+      setEventData(response.data);
+      setDataSource(response.data.zone);
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false); // 数据加载完成后或请求出错后设置 loading 为 false
+    }
   };
-
   useEffect(() => {
-    getActivityData();
+    getEventData();
   }, []);
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   const handleTicketChange = (key, value) => {
     setDataSource((prevData) => {
       const newData = prevData.map((item) => {
-        if (item.key === key) {
+        if (item.name === key) {
           return { ...item, ticket_amount: value };
         } else {
           return { ...item, ticket_amount: 0, disabled: value !== 0 };
@@ -168,24 +170,33 @@ function ActivityTicket() {
   return (
     <>
       <Row style={{ textAlign: "center", justifyContent: "center" }}>
-        <TitleComponent label={`| ${activityData.title} |`} />
+        <TitleComponent label={`| ${eventData.title} |`} />
       </Row>
       <br />
       <Row gutter={20}>
         <Col span={6}>
           <img
             style={{ width: "100%", height: "auto", objectFit: "cover" }}
-            src={activityData.poster}
+            src={eventData.poster}
             alt=""
           />
         </Col>
         <Col span={18}>
-          <h6>時間 | {activityData.date}</h6>
-          <h6>地點 | {activityData.place}</h6>
-          <h6>票價 | {activityData.price}</h6>
+          <h6>時間 | {eventData.date}</h6>
+          <h6>地點 | {eventData.venue.name}</h6>
+          <h6>
+            票價 |
+            {eventData.zone
+              .sort((a, b) => a.price - b.price)
+              .map(
+                (area, index) => `${area.price}${index !== eventData.zone.length - 1 ? " / " : ""}`
+              )}
+          </h6>
           <Divider orientation="left" orientationMargin={0}>
             <strong>節目介紹</strong>
           </Divider>
+          <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(eventData.description) }}></p>
+
           <p>
             Lorem ipsum dolor, sit amet consectetur adipisicing elit. Beatae unde sed voluptatibus
             corporis eveniet, dolore possimus. Itaque autem nostrum eligendi laudantium nemo
@@ -195,7 +206,7 @@ function ActivityTicket() {
             <strong>演出曲目</strong>
           </Divider>
           <Col>
-            <ProgramTable programData={activityData.program} />
+            <ProgramTable programData={eventData.program} />
           </Col>
         </Col>
       </Row>
@@ -215,16 +226,16 @@ function ActivityTicket() {
 
       <Row justify={"center"}>
         <TicketTable
-          dataSource={activityData.ticket}
+          dataSource={dataSource}
           handleTicketChange={handleTicketChange}
           resetTicketCounts={resetTicketCounts}
         />
         <Col style={{ marginTop: "48px" }}>
-          <SeatsImage stageImage={activityData.stageImage} />
+          <SeatsImage stageImage={eventData.stageImage} />
         </Col>
       </Row>
       <br />
     </>
   );
 }
-export default ActivityTicket;
+export default ActivityDetail;

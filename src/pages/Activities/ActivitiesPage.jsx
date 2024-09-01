@@ -17,13 +17,14 @@ const StylePagination = styled.div`
 `;
 
 function Activities() {
-  const [activitiesData, setActivitiesData] = useState([]);
+  const [eventData, setActivitiesData] = useState([]);
   const apiUrl = process.env.REACT_APP_API_URL;
 
   const getVideosData = async () => {
     try {
-      const response = await axios.get(`${apiUrl}activities/`);
-      setActivitiesData(response.data);
+      const response = await axios.get(`${apiUrl}activity/events/`);
+      setActivitiesData(response.data.events);
+      console.log(response.data.events);
     } catch (error) {
       console.log(error);
     }
@@ -38,7 +39,7 @@ function Activities() {
       <Space direction="vertical" size="large">
         <SearchBar />
         <Row>
-          <ActivityComponent activitiesData={activitiesData} />
+          <ActivityComponent eventData={eventData} />
         </Row>
       </Space>
       <StylePagination>

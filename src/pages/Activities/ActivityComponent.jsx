@@ -1,8 +1,7 @@
 import styled from "styled-components";
-import { Row, Col, Button, Flex } from "antd";
+import { Row, Col, Button, Flex, Divider } from "antd";
 import React, { Fragment } from "react";
 import { Link } from "react-router-dom";
-import DOMPurify from "dompurify"; //清理HTML
 
 // import { activitiesData } from "../../../textFile";
 
@@ -12,6 +11,7 @@ const ActivityContainer = styled.div`
   }
   .info {
     margin-top: 20px;
+    width: 600px;
   }
 `;
 const StyleLink = styled(Link)`
@@ -27,24 +27,43 @@ const StyleLink = styled(Link)`
   }
 `;
 
-function ActivityComponent({ activitiesData }) {
+function ActivityComponent({ eventData }) {
   return (
     <ActivityContainer>
-      {activitiesData.map((activity) => {
+      {eventData.map((event) => {
         return (
-          <StyleLink to={`/activities/${activity.id}`} key={activity.id}>
-            <Row gutter={30}>
-              <Col span={8}>
-                <img src={activity.poster} alt="" />
+          <StyleLink to={`/activities/${event.id}`} key={event.id}>
+            <Row justify={"space-around"}>
+              <Col span={8} push={1}>
+                <img src={event.poster} alt="" />
               </Col>
-              <Col className="info" span={16}>
-                <h3>{activity.title}</h3>
+              <Col className="info" span={14}>
+                <h3>{event.title}</h3>
                 <h5>
-                  {activity.date} - {activity.place}
+                  {event.date}（{event.weekday}） {event.time}
                 </h5>
-                <h5 style={{ color: "orange" }}>票價：{activity.price}</h5>
-
-                <p>{activity.description}</p>
+                <h5>{event.venue.name}</h5>
+                <h6>
+                  演出者：
+                  {event.player.map((person, index) => (
+                    <span key={index}>
+                      {person.title}
+                      {"\u00A0\u00A0"}
+                      {person.name}
+                      <Divider type="vertical" />
+                    </span>
+                  ))}
+                  {/* {event.player.map((person) => `${person.title} | ${person.name}\u00A0\u00A0`)} */}
+                </h6>
+                <h6 style={{ color: "orange" }}>
+                  票價：
+                  {event.zone
+                    .sort((a, b) => a.price - b.price)
+                    .map(
+                      (area, index) =>
+                        `${area.price}${index !== event.zone.length - 1 ? " / " : ""}`
+                    )}
+                </h6>
                 <Flex justify="end">
                   <Button type="primary">購票去</Button>
                 </Flex>

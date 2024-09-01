@@ -48,7 +48,7 @@ function ProductDetail() {
   };
 
   useEffect(() => {
-    if (productData?.size_list) {
+    if (productData.size_list) {
       const options = productData.size_list.map((item) => ({
         label: `${item.size} ${item.description}`,
         value: item.size,
@@ -113,7 +113,7 @@ function ProductDetail() {
             <br />
             <Row
               style={{
-                display: productData.size_list ? "block" : "none",
+                display: productData.size_list.length > 0 ? "block" : "none",
                 color: "orange",
                 fontWeight: "bold",
               }}
@@ -126,7 +126,11 @@ function ProductDetail() {
                   },
                 }}
               >
-                <Select className="sizeOption" size="small" options={sizeOptions}></Select>
+                <Select
+                  className="sizeOption"
+                  size="small"
+                  options={sizeOptions ? sizeOptions : "單一尺寸"}
+                ></Select>
               </ConfigProvider>
             </Row>
             <br />

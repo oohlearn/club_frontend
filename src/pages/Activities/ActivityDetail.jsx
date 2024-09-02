@@ -2,8 +2,7 @@ import { Col, Row, Space, Divider, Table, Button, Select, Checkbox } from "antd"
 import { QuestionCircleTwoTone } from "@ant-design/icons";
 import TitleComponent from "../../components/TitleComponent";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import SeatsImage from "../../components/SeatsImage";
 import axios from "axios";
 import DOMPurify from "dompurify"; //清理HTML
@@ -197,11 +196,6 @@ function ActivityDetail() {
           </Divider>
           <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(eventData.description) }}></p>
 
-          <p>
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Beatae unde sed voluptatibus
-            corporis eveniet, dolore possimus. Itaque autem nostrum eligendi laudantium nemo
-            perspiciatis nam dolorem, earum eaque tempora modi reiciendis?
-          </p>
           <Divider orientation="left" orientationMargin={0}>
             <strong>演出曲目</strong>
           </Divider>

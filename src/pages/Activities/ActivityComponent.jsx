@@ -3,8 +3,6 @@ import { Row, Col, Button, Flex, Divider } from "antd";
 import React, { Fragment } from "react";
 import { Link } from "react-router-dom";
 
-// import { activitiesData } from "../../../textFile";
-
 const ActivityContainer = styled.div`
   img {
     width: 150px;
@@ -53,7 +51,6 @@ function ActivityComponent({ eventData }) {
                       <Divider type="vertical" />
                     </span>
                   ))}
-                  {/* {event.player.map((person) => `${person.title} | ${person.name}\u00A0\u00A0`)} */}
                 </h6>
                 <h6 style={{ color: "orange" }}>
                   票價：

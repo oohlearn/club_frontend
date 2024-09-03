@@ -6,6 +6,16 @@ import { useParams, Link } from "react-router-dom";
 import SeatsImage from "../../components/SeatsImage";
 import axios from "axios";
 import DOMPurify from "dompurify"; //清理HTML
+import styled from "styled-components";
+import AddressModal from "./AddressModal";
+
+const DetailStyle = styled.div`
+  .mapIcon {
+    width: 18px;
+    height: 18px;
+    margin-right: 5px;
+  }
+`;
 
 const selectOptions = Array.from({ length: 10 }, (_, i) => ({ value: i + 1, label: i + 1 }));
 
@@ -92,6 +102,29 @@ const TicketTable = ({ dataSource, handleTicketChange, resetTicketCounts }) => {
   );
 };
 
+function OpenAddressModal({ venue }) {
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const showLoading = () => {
+    setOpen(true);
+    setLoading(true);
+
+    // Simple loading mock. You should add cleanup logic in real world.
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  };
+  return (
+    <>
+      <Button type="link" onClick={showLoading}>
+        {"\u3000"}
+        {"\u3000"}參考交通方式
+      </Button>
+      <AddressModal venue={venue} loading={loading} setOpen={setOpen} open={open} />
+    </>
+  );
+}
+
 const ProgramTable = ({ programData }) => {
   const columns = [
     {
@@ -167,7 +200,7 @@ function ActivityDetail() {
   };
 
   return (
-    <>
+    <DetailStyle>
       <Row style={{ textAlign: "center", justifyContent: "center" }}>
         <TitleComponent label={`| ${eventData.title} |`} />
       </Row>
@@ -182,9 +215,22 @@ function ActivityDetail() {
         </Col>
         <Col span={18}>
           <h6>時間 | {eventData.date}</h6>
-          <h6>地點 | {eventData.venue.name}</h6>
+          <h6>地點 | {eventData.venue.name} </h6>
+          <p>
+            {"\u3000"}
+            {"\u3000"} {"\u3000"}
+            <Link to={eventData.venue.map_url} target="_blank" rel="noopener noreferrer">
+              <img
+                className="mapIcon"
+                src="https://cdn2.iconfinder.com/data/icons/social-media-2259/512/google-512.png"
+              />
+              Google 地圖
+            </Link>
+            {"\u3000"}
+            <OpenAddressModal venue={eventData.venue} />
+          </p>
           <h6>
-            票價 |
+            票價 |{" "}
             {eventData.zone
               .sort((a, b) => a.price - b.price)
               .map(
@@ -229,7 +275,7 @@ function ActivityDetail() {
         </Col>
       </Row>
       <br />
-    </>
+    </DetailStyle>
   );
 }
 export default ActivityDetail;

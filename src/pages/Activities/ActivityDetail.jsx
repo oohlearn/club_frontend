@@ -8,6 +8,7 @@ import axios from "axios";
 import DOMPurify from "dompurify"; //清理HTML
 import styled from "styled-components";
 import AddressModal from "./AddressModal";
+import SeatsComponents from "../../components/Seats.jsx/MSSeatsComponent";
 
 const DetailStyle = styled.div`
   .mapIcon {
@@ -253,6 +254,7 @@ function ActivityDetail() {
       <Divider orientation="left" orientationMargin={0}>
         <h5 style={{ fontWeight: "bold" }}>購票說明</h5>
       </Divider>
+      <SeatsComponents event={eventData} />
       <Row>
         <br />
         <ol>
@@ -271,7 +273,7 @@ function ActivityDetail() {
           resetTicketCounts={resetTicketCounts}
         />
         <Col style={{ marginTop: "48px" }}>
-          <SeatsImage stageImage={eventData.stageImage} />
+          <SeatsImage stageImage={eventData.official_seat_image} />
         </Col>
       </Row>
       <br />

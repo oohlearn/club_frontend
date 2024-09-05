@@ -24,6 +24,7 @@ const TicketTable = ({ dataSource, handleTicketChange, resetTicketCounts }) => {
   const filteredDataSource = dataSource
     .filter((item, index, self) => index === self.findIndex((t) => t.price === item.price))
     .sort((a, b) => b.price - a.price);
+  const getPrice = filteredDataSource.map((item) => {});
   const columns = [
     {
       title: "種類",
@@ -68,11 +69,14 @@ const TicketTable = ({ dataSource, handleTicketChange, resetTicketCounts }) => {
       key: "action",
       render: (_, record) => (
         <Space size="large">
-          <Button type="default" block style={{ background: "pink" }} disabled>
-            自行選位
-          </Button>
-          <Link to="choose_seats">
-            <Button type="default" block style={{ background: "orange" }}>
+          <Link to={`choose_seats/${record.price}`}>
+            <Button type="default" block style={{ background: "pink" }}>
+              自行選位
+            </Button>
+          </Link>
+
+          <Link>
+            <Button type="default" block style={{ background: "orange" }} disabled>
               電腦配位
             </Button>
           </Link>

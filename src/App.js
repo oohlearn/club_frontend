@@ -34,7 +34,7 @@ function App() {
           {/* sidebar */}
           <Route path="activities" element={<Activities />}></Route>
           <Route path="activities/:eventId" element={<ActivityDetail />}></Route>
-          <Route path="activities/:eventId/choose_seats" element={<ChooseSeats />}></Route>
+          <Route path="activities/:eventId/choose_seats/:price" element={<ChooseSeats />}></Route>
           <Route path="videos" element={<Videos />}></Route>
           <Route path="albums" element={<Albums />}></Route>
           <Route path="albums/:albumId" element={<AlbumDetail />}></Route>

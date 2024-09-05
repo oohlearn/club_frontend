@@ -1,27 +1,28 @@
 import styled from "styled-components";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Button, Col, Row, Select, Steps, message, theme } from "antd";
+import { Button, Col, Row, Select, Steps, message, theme, Divider } from "antd";
+import axios from "axios";
+import SeatsComponents from "../../components/Seats.jsx/MSSeatsComponent";
 import { FirstStep } from "./FirstStep";
 import { SecondStep } from "../../components/SecondStep";
 import { ThirdStep } from "../../components/ThirdStep";
-import { activitiesData } from "../../textFile";
 
 const current = 0;
-
-const StepsComponent = ({ activityData, newOrder }) => {
+// TODO與商城合併
+const StepsComponent = ({ eventData, newOrder }) => {
   const steps = [
     {
       title: "確認座位及張數",
-      content: <FirstStep activityData={activityData} newOrder={newOrder} />,
+      content: <FirstStep eventData={eventData} newOrder={newOrder} />,
     },
     {
       title: "確認訂單內容",
-      content: <SecondStep activityData={activityData} newOrder={newOrder} />,
+      content: <SecondStep eventData={eventData} newOrder={newOrder} />,
     },
     {
       title: "填寫訂購人資料及繳費",
-      content: <ThirdStep activityData={activityData} newOrder={newOrder} />,
+      content: <ThirdStep eventData={eventData} newOrder={newOrder} />,
     },
   ];
   const { token } = theme.useToken();
@@ -45,7 +46,7 @@ const StepsComponent = ({ activityData, newOrder }) => {
   };
   return (
     <>
-      <Steps current={current} items={items} activityData={activityData} newOrder={newOrder} />
+      <Steps current={current} items={items} activityData={eventData} newOrder={newOrder} />
       <div style={contentStyle}>{steps[current].content}</div>
       <div
         style={{
@@ -81,22 +82,62 @@ const StepsComponent = ({ activityData, newOrder }) => {
 };
 
 function ChooseSeats() {
-  const { activityId } = useParams();
-  const navigate = useNavigate();
-  const activityIndex = parseInt(activityId) - 1;
-  const activityData = activitiesData[activityIndex];
+  const { eventId } = useParams();
+  const [eventData, setEventData] = useState({});
+  const [dataSource, setDataSource] = useState([]);
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const [loading, setLoading] = useState(true);
+  const [choicedSeats, setChoiceSeats] = useState([]);
 
-  // 检查 activityData 是否存在
-  if (!activityData) {
-    // 如果活动不存在，可以重定向到一个错误页面或者首页
-    navigate("/");
-    return null;
+  const getEventData = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}activity/events/${eventId}/`);
+      setEventData(response.data);
+      setDataSource(response.data.zone);
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false); // 数据加载完成后或请求出错后设置 loading 为 false
+    }
+  };
+  useEffect(() => {
+    getEventData();
+  }, []);
+  if (loading) {
+    return <div>Loading...</div>;
   }
+
+  const handleClick = (seat) => {
+    console.log(seat);
+  };
 
   return (
     <>
-      <StepsComponent current={current} activityData={activityData} />
+      {/* <StepsComponent current={current} eventData={eventData} /> */}
       <br />
+      <Row style={{ display: eventData.ticket_system_url ? "none" : "block" }}>
+        <Divider
+          orientation="center"
+          orientationMargin={0}
+          style={{ display: eventData.ticket_system_url ? "none" : "block" }}
+        >
+          <h5 style={{ fontWeight: "bold" }}>購票說明</h5>
+        </Divider>
+        <ol>
+          <li>
+            請先選擇欲購票價的<strong>『張數』</strong>，再點選<strong>『選位方式』</strong>
+            ，即可進入訂購確認頁面。
+          </li>
+          <li>單次購票僅能選擇單一票種，若須購買不同票種，請再次下單購買。</li>
+        </ol>
+
+        <SeatsComponents
+          event={eventData}
+          onClick={handleClick}
+          display={eventData.ticket_system_url ? "none" : "block"}
+        />
+      </Row>
     </>
   );
 }

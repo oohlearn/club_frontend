@@ -54,11 +54,11 @@ function ActivityComponent({ eventData }) {
                 </h6>
                 <h6 style={{ color: "orange" }}>
                   票價：
-                  {event.zone
-                    .sort((a, b) => a.price - b.price)
+                  {[...new Set(event.zone.map((area) => area.price))]
+                    .sort((a, b) => a - b)
                     .map(
-                      (area, index) =>
-                        `${area.price}${index !== event.zone.length - 1 ? " / " : ""}`
+                      (price, index, prices) =>
+                        `${price}${index !== prices.length - 1 ? " / " : ""}`
                     )}
                 </h6>
                 <Flex justify="end">

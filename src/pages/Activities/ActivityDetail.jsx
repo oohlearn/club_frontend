@@ -21,6 +21,9 @@ const DetailStyle = styled.div`
 const selectOptions = Array.from({ length: 10 }, (_, i) => ({ value: i + 1, label: i + 1 }));
 
 const TicketTable = ({ dataSource, handleTicketChange, resetTicketCounts }) => {
+  const filteredDataSource = dataSource
+    .filter((item, index, self) => index === self.findIndex((t) => t.price === item.price))
+    .sort((a, b) => b.price - a.price);
   const columns = [
     {
       title: "種類",
@@ -80,7 +83,7 @@ const TicketTable = ({ dataSource, handleTicketChange, resetTicketCounts }) => {
   return (
     <Table
       columns={columns}
-      dataSource={dataSource}
+      dataSource={filteredDataSource}
       pagination={{ hideOnSinglePage: "true" }}
       expandable={{
         expandedRowRender: (record) => (
@@ -231,13 +234,21 @@ function ActivityDetail() {
             <OpenAddressModal venue={eventData.venue} />
           </p>
           <h6>
-            票價 |{" "}
-            {eventData.zone
-              .sort((a, b) => a.price - b.price)
-              .map(
-                (area, index) => `${area.price}${index !== eventData.zone.length - 1 ? " / " : ""}`
-              )}
+            票價 | {""}
+            {[...new Set(eventData.zone.map((area) => area.price))]
+              .sort((a, b) => a - b)
+              .map((price, index, prices) => `${price}${index !== prices.length - 1 ? " / " : ""}`)}
           </h6>
+          <h6 style={{ display: eventData.ticket_system_url ? "block" : "none" }}>
+            {"\u3000"}
+            {"\u3000"}
+            <Link target="_blank" to={eventData.ticket_system_url}>
+              <Button type="link">
+                <strong>購票連結</strong>
+              </Button>
+            </Link>
+          </h6>
+
           <Divider orientation="left" orientationMargin={0}>
             <strong>節目介紹</strong>
           </Divider>
@@ -251,12 +262,16 @@ function ActivityDetail() {
           </Col>
         </Col>
       </Row>
-      <Divider orientation="left" orientationMargin={0}>
-        <h5 style={{ fontWeight: "bold" }}>購票說明</h5>
-      </Divider>
-      <SeatsComponents event={eventData} />
-      <Row>
-        <br />
+      <br />
+
+      <Row style={{ display: eventData.ticket_system_url ? "none" : "block" }}>
+        <Divider
+          orientation="center"
+          orientationMargin={0}
+          style={{ display: eventData.ticket_system_url ? "none" : "block" }}
+        >
+          <h5 style={{ fontWeight: "bold" }}>購票說明</h5>
+        </Divider>
         <ol>
           <li>
             請先選擇欲購票價的<strong>『張數』</strong>，再點選<strong>『選位方式』</strong>
@@ -264,9 +279,14 @@ function ActivityDetail() {
           </li>
           <li>單次購票僅能選擇單一票種，若須購買不同票種，請再次下單購買。</li>
         </ol>
+
+        <SeatsComponents
+          event={eventData}
+          display={eventData.ticket_system_url ? "none" : "block"}
+        />
       </Row>
 
-      <Row justify={"center"}>
+      <Row justify={"center"} style={{ display: eventData.ticket_system_url ? "none" : "block" }}>
         <TicketTable
           dataSource={dataSource}
           handleTicketChange={handleTicketChange}

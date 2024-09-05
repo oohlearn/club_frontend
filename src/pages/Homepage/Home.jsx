@@ -44,20 +44,6 @@ function MainArticle({ mainArticle }) {
             </Row>
           </Col>
         </Row>
-        <div className="container">
-          <div className="row">
-            <div className="col-5">
-              <img className="mainImg" src={mainArticle.poster} alt="" width="100%" />
-            </div>
-            <div className="col-7">
-              <h3>{mainArticle.title}</h3>
-              <p dangerouslySetInnerHTML={{ __html: getText(mainArticle.description) }} />
-              <Row align={"bottom"}>
-                <Button type="primary">購票去</Button>
-              </Row>
-            </div>
-          </div>
-        </div>
       </Link>
     </MainLinkStyle>
   );

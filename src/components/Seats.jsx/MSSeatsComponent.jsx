@@ -2,27 +2,25 @@ import { Row, Col } from "antd";
 import styled from "styled-components";
 
 const SeatsStyle = styled.div`
-  .seats {
+  /* .seatss {
     display: flex;
     flex-direction: column;
     transform: perspective(1000px) rotateX(50deg);
-    width: 1000px;
     margin: 0px auto;
     align-items: center;
     background: white;
-    overflow-x: auto;
-  }
+  } */
 
   .seat {
-    width: 25px;
-    height: 25px;
+    width: 20px;
+    height: 20px;
     text-align: center;
     border-radius: 4px 4px 8px 8px;
     position: relative;
     border: 1px solid #000;
     margin: 2px;
     display: inline-block;
-    font-size: xx-small;
+    font-size: 10px;
     align-items: center;
   }
   .stage {
@@ -35,19 +33,32 @@ const SeatsStyle = styled.div`
     flex-wrap: nowrap;
     width: 1000px;
     display: flex;
+    /* justify-content: center; */
+  }
+  ${(props) => `display: ${props.display}`};
+  border: 1px solid gray;
+  padding: 3px;
+  width: 600px;
+
+  .seats {
+    overflow-y: auto;
+    display: flex;
+    height: 500px;
+    width: 600px;
+    display: flex;
     justify-content: center;
   }
 `;
 
-function SeatsComponents({ event }) {
+function SeatsComponents({ event, display }) {
   return (
-    <SeatsStyle>
+    <SeatsStyle display={display}>
       <Row>
         <Col className="stage" span={24}>
           舞台
         </Col>
       </Row>
-      <Row justify={"space-around"}>
+      <Row justify={"space-around"} className="seats">
         <Col span={5}>
           {event.zone
             .filter((zone) => zone.area === "前左")
@@ -88,7 +99,7 @@ function SeatsComponents({ event }) {
               });
             })}
         </Col>
-        <Col>
+        <Col span={12}>
           {event.zone
             .filter((zone) => zone.area === "前中")
             .map((area) => {
@@ -137,7 +148,7 @@ function SeatsComponents({ event }) {
               });
             })}
         </Col>
-        <Col>
+        <Col span={5}>
           {event.zone
             .filter((zone) => zone.area === "前左")
             .map((area) => {

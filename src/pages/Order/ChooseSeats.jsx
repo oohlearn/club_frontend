@@ -8,6 +8,15 @@ import { FirstStep } from "./FirstStep";
 import { SecondStep } from "../../components/SecondStep";
 import { ThirdStep } from "../../components/ThirdStep";
 
+const SeatsViewStyle = styled.div`
+  .seat {
+    &:hover {
+      color: white;
+      cursor: pointer;
+    }
+  }
+`;
+
 const current = 0;
 // TODO與商城合併
 const StepsComponent = ({ eventData, newOrder }) => {
@@ -87,7 +96,7 @@ function ChooseSeats() {
   const [dataSource, setDataSource] = useState([]);
   const apiUrl = process.env.REACT_APP_API_URL;
   const [loading, setLoading] = useState(true);
-  const [choicedSeats, setChoiceSeats] = useState([]);
+  const [choiceSeats, setChoiceSeats] = useState([]);
 
   const getEventData = async () => {
     try {
@@ -109,14 +118,32 @@ function ChooseSeats() {
   }
 
   const handleClick = (seat) => {
-    console.log(seat);
+    // 获取之前选择的座位
+    const newChoiceSeats = [...choiceSeats];
+
+    // 检查座位是否已经存在于选择中
+    const seatIndex = newChoiceSeats.findIndex(
+      (existingSeat) => existingSeat.seat_num === seat.seat_num
+    );
+
+    if (seatIndex === -1) {
+      // 如果座位不在选择中，则添加它
+      newChoiceSeats.push(seat);
+    } else {
+      // 如果座位已在选择中，则从选择中移除它
+      newChoiceSeats.splice(seatIndex, 1);
+    }
+
+    // 更新选择的座位
+    setChoiceSeats(newChoiceSeats);
+    console.log(choiceSeats);
   };
 
   return (
     <>
       {/* <StepsComponent current={current} eventData={eventData} /> */}
       <br />
-      <Row style={{ display: eventData.ticket_system_url ? "none" : "block" }}>
+      <Row justify={"center"}>
         <Divider
           orientation="center"
           orientationMargin={0}
@@ -131,12 +158,13 @@ function ChooseSeats() {
           </li>
           <li>單次購票僅能選擇單一票種，若須購買不同票種，請再次下單購買。</li>
         </ol>
-
-        <SeatsComponents
-          event={eventData}
-          onClick={handleClick}
-          display={eventData.ticket_system_url ? "none" : "block"}
-        />
+        <SeatsViewStyle>
+          <SeatsComponents
+            event={eventData}
+            handleClick={handleClick}
+            display={eventData.ticket_system_url ? "none" : "block"}
+          />
+        </SeatsViewStyle>
       </Row>
     </>
   );

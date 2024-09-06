@@ -1,16 +1,8 @@
 import { Row, Col } from "antd";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 
 const SeatsStyle = styled.div`
-  /* .seatss {
-    display: flex;
-    flex-direction: column;
-    transform: perspective(1000px) rotateX(50deg);
-    margin: 0px auto;
-    align-items: center;
-    background: white;
-  } */
-
   .seat {
     width: 20px;
     height: 20px;
@@ -27,25 +19,24 @@ const SeatsStyle = styled.div`
     border: 1px solid #000;
     justify-content: center;
     text-align: center;
-    margin-bottom: 10px;
+    margin: 10px 0px 10px 0px;
     width: 100px;
   }
   .row {
     flex-wrap: nowrap;
-    width: 1000px;
+    width: 670px;
     display: flex;
-    /* justify-content: center; */
   }
   ${(props) => `display: ${props.display}`};
   border: 1px solid gray;
-  padding: 3px;
   width: 670px;
+  padding-bottom: 10px;
   .area {
     height: 120px;
     flex-wrap: nowrap;
     display: flex;
-    width: 700px;
-    margin: 5px;
+    width: 680px;
+    margin: 3px;
   }
   .blank-row {
     margin-top: 22px;
@@ -53,12 +44,18 @@ const SeatsStyle = styled.div`
   .seats {
     overflow-y: auto;
     height: 300px;
-    width: 680px;
+    width: 670px;
     justify-content: center;
   }
 `;
 
-function SeatsComponents({ event, display }) {
+function SeatsComponents({ event, display, handleClick }) {
+  const [seatsData, setSeatsData] = useState(event.zone);
+  const getData = () => {
+    if (event.zone.length === 0) {
+      setSeatsData(event.zoneForNumberRow);
+    }
+  };
   const getColor = (area, seat) => {
     if (seat.not_sell) {
       return "#ADADAD";
@@ -68,6 +65,9 @@ function SeatsComponents({ event, display }) {
       return seat.color;
     }
   };
+  useEffect(() => {
+    getData();
+  }, []);
   return (
     <SeatsStyle display={display}>
       <Row justify={"center"}>
@@ -76,38 +76,43 @@ function SeatsComponents({ event, display }) {
       <Row className="seats">
         <Row justify={"space-around"} className="area area-font">
           <Col span={6}>
-            {event.zone
-              .filter((zone) => zone.area === "前左")
+            {seatsData
+              .filter((zone) => zone.area === "A")
               .map((area) => {
                 const rows = area.seat.reduce((acc, seat) => {
-                  const currentRowNum = seat.seat_num[0];
-                  const lastRowNum = acc[acc.length - 1];
+                  const currentRowNum = seat.row_num || seat.seat_num[0];
+                  const lastRow = acc[acc.length - 1];
 
-                  if (!lastRowNum || lastRowNum[0].seat_num[0] !== currentRowNum) {
+                  if (
+                    !lastRow ||
+                    (lastRow[0].row_num && lastRow[0].row_num !== currentRowNum) ||
+                    (!lastRow[0].row_num && lastRow[0].seat_num[0] !== currentRowNum)
+                  ) {
                     acc.push([seat]);
                   } else {
-                    lastRowNum.push(seat);
+                    lastRow.push(seat);
                   }
+
                   return acc;
                 }, []);
+
                 return rows.map((row, rowIndex) => {
                   // 對整排座位進行排序
                   const sortedRow = row.sort((a, b) => {
-                    const aNum = parseInt(a.seat_num.slice(1));
-                    const bNum = parseInt(b.seat_num.slice(1));
-
-                    return bNum - aNum;
+                    const aNum = parseInt(a.seat_num.replace(/\D/g, ""));
+                    const bNum = parseInt(b.seat_num.replace(/\D/g, ""));
+                    return bNum - aNum; // 改為升序排列
                   });
 
                   return (
-                    <Row key={`${rowIndex}`} justify={"end"}>
+                    <Row key={`row-${rowIndex}`} justify="end">
                       {sortedRow.map((seat, seatIndex) => (
                         <Col
                           className="seat"
                           style={{
                             backgroundColor: getColor(area, seat),
                           }}
-                          key={`${rowIndex}-${seatIndex}`}
+                          key={`seat-${rowIndex}-${seatIndex}`}
                         >
                           {seat.seat_num}
                         </Col>
@@ -118,8 +123,8 @@ function SeatsComponents({ event, display }) {
               })}
           </Col>
           <Col span={12}>
-            {event.zone
-              .filter((zone) => zone.area === "前中")
+            {seatsData
+              .filter((zone) => zone.area === "B")
               .map((area) => {
                 const rows = area.seat.reduce((acc, seat) => {
                   const currentRowNum = seat.seat_num[0];
@@ -169,8 +174,8 @@ function SeatsComponents({ event, display }) {
               })}
           </Col>
           <Col span={6}>
-            {event.zone
-              .filter((zone) => zone.area === "前右")
+            {seatsData
+              .filter((zone) => zone.area === "C")
               .map((area) => {
                 const rows = area.seat.reduce((acc, seat) => {
                   const currentRowNum = seat.seat_num[0];
@@ -202,8 +207,8 @@ function SeatsComponents({ event, display }) {
 
         <Row justify={"space-around"} className="area area-middle">
           <Col span={6}>
-            {event.zone
-              .filter((zone) => zone.area === "中左")
+            {seatsData
+              .filter((zone) => zone.area === "D")
               .map((area) => {
                 const rows = area.seat.reduce((acc, seat) => {
                   const currentRowNum = seat.seat_num[0];
@@ -244,8 +249,8 @@ function SeatsComponents({ event, display }) {
               })}
           </Col>
           <Col span={12}>
-            {event.zone
-              .filter((zone) => zone.area === "中中")
+            {seatsData
+              .filter((zone) => zone.area === "E")
               .map((area) => {
                 const rows = area.seat.reduce((acc, seat) => {
                   const currentRowNum = seat.seat_num[0];
@@ -295,8 +300,8 @@ function SeatsComponents({ event, display }) {
               })}
           </Col>
           <Col span={6}>
-            {event.zone
-              .filter((zone) => zone.area === "中右")
+            {seatsData
+              .filter((zone) => zone.area === "F")
               .map((area) => {
                 const rows = area.seat.reduce((acc, seat) => {
                   const currentRowNum = seat.seat_num[0];
@@ -328,8 +333,8 @@ function SeatsComponents({ event, display }) {
 
         <Row justify={"space-around"} className="area area-back">
           <Col span={6} className="blank-row">
-            {event.zone
-              .filter((zone) => zone.area === "後左")
+            {seatsData
+              .filter((zone) => zone.area === "G")
               .map((area) => {
                 const rows = area.seat.reduce((acc, seat) => {
                   const currentRowNum = seat.seat_num[0];
@@ -370,8 +375,8 @@ function SeatsComponents({ event, display }) {
               })}
           </Col>
           <Col span={12}>
-            {event.zone
-              .filter((zone) => zone.area === "後中")
+            {seatsData
+              .filter((zone) => zone.area === "H")
               .map((area) => {
                 const rows = area.seat.reduce((acc, seat) => {
                   const currentRowNum = seat.seat_num[0];
@@ -421,8 +426,8 @@ function SeatsComponents({ event, display }) {
               })}
           </Col>
           <Col span={6} className="blank-row">
-            {event.zone
-              .filter((zone) => zone.area === "後右")
+            {seatsData
+              .filter((zone) => zone.area === "I")
               .map((area) => {
                 const rows = area.seat.reduce((acc, seat) => {
                   const currentRowNum = seat.seat_num[0];

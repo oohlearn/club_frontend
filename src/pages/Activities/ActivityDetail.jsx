@@ -170,6 +170,9 @@ function ActivityDetail() {
       const response = await axios.get(`${apiUrl}activity/events/${eventId}/`);
       setEventData(response.data);
       setDataSource(response.data.zone);
+      if (response.data.zone.length === 0) {
+        setDataSource(response.data.zoneForNumberRow);
+      }
       console.log(response.data);
     } catch (error) {
       console.log(error);
@@ -296,9 +299,6 @@ function ActivityDetail() {
           handleTicketChange={handleTicketChange}
           resetTicketCounts={resetTicketCounts}
         />
-        <Col style={{ marginTop: "48px" }}>
-          <SeatsImage stageImage={eventData.official_seat_image} />
-        </Col>
       </Row>
       <br />
     </DetailStyle>

@@ -8,7 +8,7 @@ import axios from "axios";
 import DOMPurify from "dompurify"; //清理HTML
 import styled from "styled-components";
 import AddressModal from "./AddressModal";
-import SeatsComponents from "../../components/Seats.jsx/MSSeatsComponent";
+import SeatsViewComponents from "../../components/Seats.jsx/MSSeatsView";
 
 const DetailStyle = styled.div`
   .mapIcon {
@@ -287,7 +287,7 @@ function ActivityDetail() {
           <li>單次購票僅能選擇單一票種，若須購買不同票種，請再次下單購買。</li>
         </ol>
 
-        <SeatsComponents
+        <SeatsViewComponents
           event={eventData}
           display={eventData.ticket_system_url ? "none" : "block"}
         />

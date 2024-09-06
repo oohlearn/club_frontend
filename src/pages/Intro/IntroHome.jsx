@@ -28,19 +28,27 @@ function IntroHome() {
   }
   return (
     <>
-      <Row justify={"center"}>
-        <img src={introData[0].indexImage} alt="團照" width={"80%"} height={"auto"} />
-      </Row>
-      <br />
-      <Row gutter={20}>
-        <Col span={6}>
-          <img src={introData[0].image_2} alt="" width={"80%"} height={"auto"} />
-        </Col>
-        <Col
-          span={18}
-          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(introData[0].description) }}
-        ></Col>
-      </Row>
+      {introData && introData.length > 0 ? (
+        <>
+          <Row justify={"center"}>
+            <img src={introData[0].indexImage} alt="團照" width={"80%"} height={"auto"} />
+          </Row>
+          <br />
+          <Row gutter={20}>
+            <Col span={6}>
+              <img src={introData[0].image_2} alt="" width={"80%"} height={"auto"} />
+            </Col>
+            <Col
+              span={18}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(introData[0].description) }}
+            ></Col>
+          </Row>
+        </>
+      ) : (
+        <Row justify={"center"}>
+          <Col>～資料建立中～</Col>
+        </Row>
+      )}
     </>
   );
 }

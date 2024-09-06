@@ -43,15 +43,6 @@ function NewsDetail() {
       setLoading(false); // 数据加载完成后或请求出错后设置 loading 为 false
     }
   };
-  const bigFirstWord = (content) => {
-    if (!content) return "";
-    // 提取第一个字符和剩下的内容
-    const firstChar = content.charAt(0);
-    const restOfContent = content.slice(1);
-
-    // 返回带有 `span` 包裹的第一个字母
-    return `<span class="first-char">${firstChar}</span>${restOfContent}`;
-  };
 
   useEffect(() => {
     getEventData();

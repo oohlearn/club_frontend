@@ -1,6 +1,9 @@
 import { Row, Col } from "antd";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
+import axios from "axios";
+import { useParams } from "react-router-dom";
+const apiUrl = process.env.REACT_APP_API_URL;
 
 const SeatsStyle = styled.div`
   .seat {
@@ -49,25 +52,66 @@ const SeatsStyle = styled.div`
   }
 `;
 
-function SeatsComponents({ event, display, handleClick }) {
-  const [seatsData, setSeatsData] = useState(event.zone);
-  const getData = () => {
-    if (event.zone.length === 0) {
-      setSeatsData(event.zoneForNumberRow);
+function SeatsChooseComponents({ display, handleClick }) {
+  const [seatsData, setSeatsData] = useState([]);
+  const [eventData, setEventData] = useState({});
+  const { eventId } = useParams();
+  const { price } = useParams();
+
+  const getData = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}activity/events/${eventId}/`);
+
+      if (response.data.zone.length === 0) {
+        setSeatsData(response.data.zoneForNumberRow);
+        console.log(seatsData);
+      } else {
+        setSeatsData(response.data.zone);
+        console.log(seatsData);
+      }
+      console.log(eventData);
+    } catch (error) {
+      console.log(error);
     }
   };
-  const getColor = (area, seat) => {
-    if (seat.not_sell) {
-      return "#ADADAD";
-    } else if (seat.color === "") {
-      return area.color;
+
+  const getBGColor = (area, seat) => {
+    let color = area.color;
+    if (seat.color === "") {
+      color = area.color;
     } else {
-      return seat.color;
+      color = seat.color;
     }
+    if (area.price !== parseInt(price)) {
+      color = "#FFFFFF";
+    }
+    if (seat.price === parseInt(price)) {
+      color = seat.color;
+    }
+    if (seat.not_sell || seat.is_sold) {
+      color = "#ADADAD";
+    }
+    return color;
   };
+
+  const getTextColor = (area, seat) => {
+    let color = "#000000"; //初始黑色
+    if (area.price !== parseInt(price)) {
+      color = "#FFFFFF";
+    }
+    if (seat.price === parseInt(price)) {
+      color = "#000000";
+    }
+    if (seat.not_sell || seat.is_sold) {
+      color = "#ADADAD";
+    }
+    return color;
+  };
+
   useEffect(() => {
     getData();
   }, []);
+
   return (
     <SeatsStyle display={display}>
       <Row justify={"center"}>
@@ -110,9 +154,13 @@ function SeatsComponents({ event, display, handleClick }) {
                         <Col
                           className="seat"
                           style={{
-                            backgroundColor: getColor(area, seat),
+                            backgroundColor: getBGColor(area, seat),
+                            color: getTextColor(area, seat),
                           }}
                           key={`seat-${rowIndex}-${seatIndex}`}
+                          onClick={() => {
+                            handleClick(seat);
+                          }}
                         >
                           {seat.seat_num}
                         </Col>
@@ -127,14 +175,19 @@ function SeatsComponents({ event, display, handleClick }) {
               .filter((zone) => zone.area === "B")
               .map((area) => {
                 const rows = area.seat.reduce((acc, seat) => {
-                  const currentRowNum = seat.seat_num[0];
-                  const lastRowNum = acc[acc.length - 1];
+                  const currentRowNum = seat.row_num || seat.seat_num[0];
+                  const lastRow = acc[acc.length - 1];
 
-                  if (!lastRowNum || lastRowNum[0].seat_num[0] !== currentRowNum) {
+                  if (
+                    !lastRow ||
+                    (lastRow[0].row_num && lastRow[0].row_num !== currentRowNum) ||
+                    (!lastRow[0].row_num && lastRow[0].seat_num[0] !== currentRowNum)
+                  ) {
                     acc.push([seat]);
                   } else {
-                    lastRowNum.push(seat);
+                    lastRow.push(seat);
                   }
+
                   return acc;
                 }, []);
                 return rows.map((row, rowIndex) => {
@@ -162,7 +215,11 @@ function SeatsComponents({ event, display, handleClick }) {
                           className="seat"
                           key={`${rowIndex}-${seatIndex}`}
                           style={{
-                            backgroundColor: getColor(area, seat),
+                            backgroundColor: getBGColor(area, seat),
+                            color: getTextColor(area, seat),
+                          }}
+                          onClick={() => {
+                            handleClick(seat);
                           }}
                         >
                           {seat.seat_num}
@@ -178,14 +235,19 @@ function SeatsComponents({ event, display, handleClick }) {
               .filter((zone) => zone.area === "C")
               .map((area) => {
                 const rows = area.seat.reduce((acc, seat) => {
-                  const currentRowNum = seat.seat_num[0];
-                  const lastRowNum = acc[acc.length - 1];
+                  const currentRowNum = seat.row_num || seat.seat_num[0];
+                  const lastRow = acc[acc.length - 1];
 
-                  if (!lastRowNum || lastRowNum[0].seat_num[0] !== currentRowNum) {
+                  if (
+                    !lastRow ||
+                    (lastRow[0].row_num && lastRow[0].row_num !== currentRowNum) ||
+                    (!lastRow[0].row_num && lastRow[0].seat_num[0] !== currentRowNum)
+                  ) {
                     acc.push([seat]);
                   } else {
-                    lastRowNum.push(seat);
+                    lastRow.push(seat);
                   }
+
                   return acc;
                 }, []);
                 return rows.map((row, rowIndex) => (
@@ -194,7 +256,11 @@ function SeatsComponents({ event, display, handleClick }) {
                       <Col
                         className="seat"
                         key={seatIndex}
-                        style={{ backgroundColor: seat.color === "" ? area.color : seat.color }}
+                        onClick={() => handleClick(seat)}
+                        style={{
+                          backgroundColor: getBGColor(area, seat),
+                          color: getTextColor(area, seat),
+                        }}
                       >
                         {seat.seat_num}
                       </Col>
@@ -211,14 +277,19 @@ function SeatsComponents({ event, display, handleClick }) {
               .filter((zone) => zone.area === "D")
               .map((area) => {
                 const rows = area.seat.reduce((acc, seat) => {
-                  const currentRowNum = seat.seat_num[0];
-                  const lastRowNum = acc[acc.length - 1];
+                  const currentRowNum = seat.row_num || seat.seat_num[0];
+                  const lastRow = acc[acc.length - 1];
 
-                  if (!lastRowNum || lastRowNum[0].seat_num[0] !== currentRowNum) {
+                  if (
+                    !lastRow ||
+                    (lastRow[0].row_num && lastRow[0].row_num !== currentRowNum) ||
+                    (!lastRow[0].row_num && lastRow[0].seat_num[0] !== currentRowNum)
+                  ) {
                     acc.push([seat]);
                   } else {
-                    lastRowNum.push(seat);
+                    lastRow.push(seat);
                   }
+
                   return acc;
                 }, []);
                 return rows.map((row, rowIndex) => {
@@ -236,9 +307,11 @@ function SeatsComponents({ event, display, handleClick }) {
                         <Col
                           className="seat"
                           style={{
-                            backgroundColor: getColor(area, seat),
+                            backgroundColor: getBGColor(area, seat),
+                            color: getTextColor(area, seat),
                           }}
                           key={`${rowIndex}-${seatIndex}`}
+                          onClick={() => handleClick(seat)}
                         >
                           {seat.seat_num}
                         </Col>
@@ -253,14 +326,19 @@ function SeatsComponents({ event, display, handleClick }) {
               .filter((zone) => zone.area === "E")
               .map((area) => {
                 const rows = area.seat.reduce((acc, seat) => {
-                  const currentRowNum = seat.seat_num[0];
-                  const lastRowNum = acc[acc.length - 1];
+                  const currentRowNum = seat.row_num || seat.seat_num[0];
+                  const lastRow = acc[acc.length - 1];
 
-                  if (!lastRowNum || lastRowNum[0].seat_num[0] !== currentRowNum) {
+                  if (
+                    !lastRow ||
+                    (lastRow[0].row_num && lastRow[0].row_num !== currentRowNum) ||
+                    (!lastRow[0].row_num && lastRow[0].seat_num[0] !== currentRowNum)
+                  ) {
                     acc.push([seat]);
                   } else {
-                    lastRowNum.push(seat);
+                    lastRow.push(seat);
                   }
+
                   return acc;
                 }, []);
                 return rows.map((row, rowIndex) => {
@@ -288,8 +366,10 @@ function SeatsComponents({ event, display, handleClick }) {
                           className="seat"
                           key={`${rowIndex}-${seatIndex}`}
                           style={{
-                            backgroundColor: getColor(area, seat),
+                            backgroundColor: getBGColor(area, seat),
+                            color: getTextColor(area, seat),
                           }}
+                          onClick={() => handleClick(seat)}
                         >
                           {seat.seat_num}
                         </Col>
@@ -304,14 +384,19 @@ function SeatsComponents({ event, display, handleClick }) {
               .filter((zone) => zone.area === "F")
               .map((area) => {
                 const rows = area.seat.reduce((acc, seat) => {
-                  const currentRowNum = seat.seat_num[0];
-                  const lastRowNum = acc[acc.length - 1];
+                  const currentRowNum = seat.row_num || seat.seat_num[0];
+                  const lastRow = acc[acc.length - 1];
 
-                  if (!lastRowNum || lastRowNum[0].seat_num[0] !== currentRowNum) {
+                  if (
+                    !lastRow ||
+                    (lastRow[0].row_num && lastRow[0].row_num !== currentRowNum) ||
+                    (!lastRow[0].row_num && lastRow[0].seat_num[0] !== currentRowNum)
+                  ) {
                     acc.push([seat]);
                   } else {
-                    lastRowNum.push(seat);
+                    lastRow.push(seat);
                   }
+
                   return acc;
                 }, []);
                 return rows.map((row, rowIndex) => (
@@ -320,7 +405,11 @@ function SeatsComponents({ event, display, handleClick }) {
                       <Col
                         className="seat"
                         key={seatIndex}
-                        style={{ backgroundColor: seat.color === "" ? area.color : seat.color }}
+                        onClick={() => handleClick(seat)}
+                        style={{
+                          backgroundColor: getBGColor(area, seat),
+                          color: getTextColor(area, seat),
+                        }}
                       >
                         {seat.seat_num}
                       </Col>
@@ -337,14 +426,19 @@ function SeatsComponents({ event, display, handleClick }) {
               .filter((zone) => zone.area === "G")
               .map((area) => {
                 const rows = area.seat.reduce((acc, seat) => {
-                  const currentRowNum = seat.seat_num[0];
-                  const lastRowNum = acc[acc.length - 1];
+                  const currentRowNum = seat.row_num || seat.seat_num[0];
+                  const lastRow = acc[acc.length - 1];
 
-                  if (!lastRowNum || lastRowNum[0].seat_num[0] !== currentRowNum) {
+                  if (
+                    !lastRow ||
+                    (lastRow[0].row_num && lastRow[0].row_num !== currentRowNum) ||
+                    (!lastRow[0].row_num && lastRow[0].seat_num[0] !== currentRowNum)
+                  ) {
                     acc.push([seat]);
                   } else {
-                    lastRowNum.push(seat);
+                    lastRow.push(seat);
                   }
+
                   return acc;
                 }, []);
                 return rows.map((row, rowIndex) => {
@@ -362,8 +456,10 @@ function SeatsComponents({ event, display, handleClick }) {
                         <Col
                           className="seat"
                           style={{
-                            backgroundColor: getColor(area, seat),
+                            backgroundColor: getBGColor(area, seat),
+                            color: getTextColor(area, seat),
                           }}
+                          onClick={() => handleClick(seat)}
                           key={`${rowIndex}-${seatIndex}`}
                         >
                           {seat.seat_num}
@@ -379,14 +475,19 @@ function SeatsComponents({ event, display, handleClick }) {
               .filter((zone) => zone.area === "H")
               .map((area) => {
                 const rows = area.seat.reduce((acc, seat) => {
-                  const currentRowNum = seat.seat_num[0];
-                  const lastRowNum = acc[acc.length - 1];
+                  const currentRowNum = seat.row_num || seat.seat_num[0];
+                  const lastRow = acc[acc.length - 1];
 
-                  if (!lastRowNum || lastRowNum[0].seat_num[0] !== currentRowNum) {
+                  if (
+                    !lastRow ||
+                    (lastRow[0].row_num && lastRow[0].row_num !== currentRowNum) ||
+                    (!lastRow[0].row_num && lastRow[0].seat_num[0] !== currentRowNum)
+                  ) {
                     acc.push([seat]);
                   } else {
-                    lastRowNum.push(seat);
+                    lastRow.push(seat);
                   }
+
                   return acc;
                 }, []);
                 return rows.map((row, rowIndex) => {
@@ -414,8 +515,10 @@ function SeatsComponents({ event, display, handleClick }) {
                           className="seat"
                           key={`${rowIndex}-${seatIndex}`}
                           style={{
-                            backgroundColor: getColor(area, seat),
+                            backgroundColor: getBGColor(area, seat),
+                            color: getTextColor(area, seat),
                           }}
+                          onClick={() => handleClick(seat)}
                         >
                           {seat.seat_num}
                         </Col>
@@ -427,17 +530,22 @@ function SeatsComponents({ event, display, handleClick }) {
           </Col>
           <Col span={6} className="blank-row">
             {seatsData
-              .filter((zone) => zone.area === "I")
+              .filter((zone) => zone.area === "J")
               .map((area) => {
                 const rows = area.seat.reduce((acc, seat) => {
-                  const currentRowNum = seat.seat_num[0];
-                  const lastRowNum = acc[acc.length - 1];
+                  const currentRowNum = seat.row_num || seat.seat_num[0];
+                  const lastRow = acc[acc.length - 1];
 
-                  if (!lastRowNum || lastRowNum[0].seat_num[0] !== currentRowNum) {
+                  if (
+                    !lastRow ||
+                    (lastRow[0].row_num && lastRow[0].row_num !== currentRowNum) ||
+                    (!lastRow[0].row_num && lastRow[0].seat_num[0] !== currentRowNum)
+                  ) {
                     acc.push([seat]);
                   } else {
-                    lastRowNum.push(seat);
+                    lastRow.push(seat);
                   }
+
                   return acc;
                 }, []);
                 return rows.map((row, rowIndex) => (
@@ -446,7 +554,11 @@ function SeatsComponents({ event, display, handleClick }) {
                       <Col
                         className="seat"
                         key={seatIndex}
-                        style={{ backgroundColor: seat.color === "" ? area.color : seat.color }}
+                        onClick={() => handleClick(seat)}
+                        style={{
+                          backgroundColor: getBGColor(area, seat),
+                          color: getTextColor(area, seat),
+                        }}
                       >
                         {seat.seat_num}
                       </Col>
@@ -460,4 +572,4 @@ function SeatsComponents({ event, display, handleClick }) {
     </SeatsStyle>
   );
 }
-export default SeatsComponents;
+export default SeatsChooseComponents;

@@ -3,10 +3,10 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button, Col, Row, Select, Steps, message, theme, Divider } from "antd";
 import axios from "axios";
-import SeatsComponents from "../../components/Seats.jsx/MSSeatsComponent";
 import { FirstStep } from "./FirstStep";
 import { SecondStep } from "../../components/SecondStep";
 import { ThirdStep } from "../../components/ThirdStep";
+import SeatsChooseComponents from "../../components/Seats.jsx/MSChoiceSeats";
 
 const SeatsViewStyle = styled.div`
   .seat {
@@ -93,34 +93,39 @@ const StepsComponent = ({ eventData, newOrder }) => {
 function ChooseSeats() {
   const { eventId } = useParams();
   const [eventData, setEventData] = useState({});
-  const [dataSource, setDataSource] = useState([]);
-  const apiUrl = process.env.REACT_APP_API_URL;
   const [loading, setLoading] = useState(true);
   const [choiceSeats, setChoiceSeats] = useState([]);
+  const [choicePrice, setChoicePrice] = useState();
+
+  const { price } = useParams();
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   const getEventData = async () => {
     try {
       const response = await axios.get(`${apiUrl}activity/events/${eventId}/`);
       setEventData(response.data);
-      setDataSource(response.data.zone);
-      console.log(response.data);
+
+      console.log(eventData);
     } catch (error) {
       console.log(error);
     } finally {
       setLoading(false); // 数据加载完成后或请求出错后设置 loading 为 false
     }
   };
+  const getPrice = () => {
+    setChoicePrice(parseInt(price));
+  };
   useEffect(() => {
     getEventData();
+    getPrice();
   }, []);
   if (loading) {
     return <div>Loading...</div>;
   }
-
+  // TODO 把非賣票、已售票、非區域鎖起來
   const handleClick = (seat) => {
     // 获取之前选择的座位
     const newChoiceSeats = [...choiceSeats];
-
     // 检查座位是否已经存在于选择中
     const seatIndex = newChoiceSeats.findIndex(
       (existingSeat) => existingSeat.seat_num === seat.seat_num
@@ -133,7 +138,6 @@ function ChooseSeats() {
       // 如果座位已在选择中，则从选择中移除它
       newChoiceSeats.splice(seatIndex, 1);
     }
-
     // 更新选择的座位
     setChoiceSeats(newChoiceSeats);
     console.log(choiceSeats);
@@ -141,7 +145,6 @@ function ChooseSeats() {
 
   return (
     <>
-      {/* <StepsComponent current={current} eventData={eventData} /> */}
       <br />
       <Row justify={"center"}>
         <Divider
@@ -159,7 +162,7 @@ function ChooseSeats() {
           <li>單次購票僅能選擇單一票種，若須購買不同票種，請再次下單購買。</li>
         </ol>
         <SeatsViewStyle>
-          <SeatsComponents
+          <SeatsChooseComponents
             event={eventData}
             handleClick={handleClick}
             display={eventData.ticket_system_url ? "none" : "block"}

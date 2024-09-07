@@ -14,7 +14,7 @@ const CartDrawer = ({ choiceSeats, onRemoveSeat }) => {
     setOpen(false);
   };
   useEffect(() => {
-    if (choiceSeats.length > 1) {
+    if (choiceSeats.length > 0) {
       setOpen(true);
     }
   }, [choiceSeats]);

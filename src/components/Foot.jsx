@@ -1,17 +1,26 @@
 import React, { useState } from "react";
 import { ShopOutlined, PhoneOutlined, StarOutlined } from "@ant-design/icons";
 import { Menu, Col, Row, Flex, Layout } from "antd";
+import { NavLink } from "react-router-dom";
 
 function Foot() {
   const { Footer, Content } = Layout;
   const items = [
     {
-      label: "幹部登入",
+      label: (
+        <NavLink to="login" style={{ textDecoration: "none" }}>
+          幹部登入
+        </NavLink>
+      ),
       key: "mail",
       icon: <ShopOutlined />,
     },
     {
-      label: "幹部註冊",
+      label: (
+        <NavLink to="register" style={{ textDecoration: "none" }}>
+          幹部註冊
+        </NavLink>
+      ),
       key: "app",
       icon: <StarOutlined />,
     },

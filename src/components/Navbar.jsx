@@ -29,7 +29,11 @@ function Navbar() {
       icon: <ShopOutlined />,
     },
     {
-      label: "活動購票",
+      label: (
+        <NavLink to="activities" style={{ textDecoration: "none" }}>
+          活動購票
+        </NavLink>
+      ),
       key: "app",
       icon: <StarOutlined />,
     },

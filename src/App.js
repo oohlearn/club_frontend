@@ -18,6 +18,8 @@ import Shop from "./pages/Shop/ShopPage";
 import ChooseSeats from "./pages/Order/ChooseSeats";
 import Checkout from "./pages/Order/Checkout";
 import ProductDetail from "./pages/Shop/ProductDetail";
+import Login from "./pages/Members/Login";
+import Register from "./pages/Members/Register";
 
 function App() {
   return (
@@ -25,6 +27,9 @@ function App() {
       <Routes>
         <Route path="/" element={<FrontLayout />}>
           <Route path="" element={<Home />}></Route>
+          <Route path="login" element={<Login />}></Route>
+          <Route path="register" element={<Register />}></Route>
+
           <Route path="intro" element={<IntroPage />}>
             <Route path="" element={<IntroHome />}></Route>
             <Route path="experiences" element={<ExperiencesPage />}></Route>

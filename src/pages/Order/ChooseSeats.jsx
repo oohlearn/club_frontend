@@ -1,12 +1,24 @@
 import styled from "styled-components";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Button, Col, Row, Select, Steps, message, theme, Divider } from "antd";
+import {
+  Button,
+  Col,
+  Row,
+  Select,
+  Steps,
+  message,
+  theme,
+  Divider,
+  Space,
+  ConfigProvider,
+} from "antd";
 import axios from "axios";
 import { FirstStep } from "./FirstStep";
 import { SecondStep } from "../../components/SecondStep";
 import { ThirdStep } from "../../components/ThirdStep";
 import SeatsChooseComponents from "../../components/Seats.jsx/MSChoiceSeats";
+import CartDrawer from "../../components/Drawer";
 
 const SeatsViewStyle = styled.div`
   .seat {
@@ -17,6 +29,37 @@ const SeatsViewStyle = styled.div`
   }
 `;
 
+export const WarningMessage = () => {
+  const [messageApi, contextHolder] = message.useMessage();
+  const success = () => {
+    messageApi.open({
+      type: "success",
+      content: "This is a success message",
+    });
+  };
+  const error = () => {
+    messageApi.open({
+      type: "error",
+      content: "This is an error message",
+    });
+  };
+  const warning = () => {
+    messageApi.open({
+      type: "warning",
+      content: "This is a warning message",
+    });
+  };
+  return (
+    <ConfigProvider theme={{ token: {} }}>
+      {contextHolder}
+      <Space>
+        <Button onClick={success}>Success</Button>
+        <Button onClick={error}>Error</Button>
+        <Button onClick={warning}>Warning</Button>
+      </Space>
+    </ConfigProvider>
+  );
+};
 const current = 0;
 // TODO與商城合併
 const StepsComponent = ({ eventData, newOrder }) => {
@@ -112,34 +155,40 @@ function ChooseSeats() {
       setLoading(false); // 数据加载完成后或请求出错后设置 loading 为 false
     }
   };
-  const getPrice = () => {
+  const getPrice = (price) => {
     setChoicePrice(parseInt(price));
   };
   useEffect(() => {
     getEventData();
-    getPrice();
+    getPrice(price);
   }, []);
   if (loading) {
     return <div>Loading...</div>;
   }
+
+  const handleRemoveSeat = (seatToRemove) => {
+    setChoiceSeats(choiceSeats.filter((seat) => seat.seat_num !== seatToRemove.seat_num));
+  };
   // TODO 把非賣票、已售票、非區域鎖起來
   const handleClick = (seat) => {
     // 获取之前选择的座位
-    const newChoiceSeats = [...choiceSeats];
     // 检查座位是否已经存在于选择中
-    const seatIndex = newChoiceSeats.findIndex(
-      (existingSeat) => existingSeat.seat_num === seat.seat_num
-    );
-
-    if (seatIndex === -1) {
-      // 如果座位不在选择中，则添加它
-      newChoiceSeats.push(seat);
+    if (seat.price === choicePrice) {
+      const seatIndex = choiceSeats.findIndex(
+        (existingSeat) => existingSeat.seat_num === seat.seat_num
+      );
+      if (seatIndex === -1) {
+        // 如果座位不在选择中，则添加它
+        setChoiceSeats([...choiceSeats, seat]);
+      } else {
+        // 如果座位已在选择中，则从选择中移除它
+        const newChoiceSeats = [...choiceSeats];
+        newChoiceSeats.splice(seatIndex, 1);
+        setChoiceSeats(newChoiceSeats);
+      }
     } else {
-      // 如果座位已在选择中，则从选择中移除它
-      newChoiceSeats.splice(seatIndex, 1);
+      message.warning("請選擇相對應的票區");
     }
-    // 更新选择的座位
-    setChoiceSeats(newChoiceSeats);
     console.log(choiceSeats);
   };
 
@@ -161,6 +210,8 @@ function ChooseSeats() {
           </li>
           <li>單次購票僅能選擇單一票種，若須購買不同票種，請再次下單購買。</li>
         </ol>
+        <CartDrawer choiceSeats={choiceSeats} onRemoveSeat={handleRemoveSeat} />
+
         <SeatsViewStyle>
           <SeatsChooseComponents
             event={eventData}

@@ -7,8 +7,8 @@ const apiUrl = process.env.REACT_APP_API_URL;
 
 const SeatsStyle = styled.div`
   .seat {
-    width: 20px;
-    height: 20px;
+    width: 10px;
+    height: 10px;
     text-align: center;
     border-radius: 4px 4px 8px 8px;
     position: relative;
@@ -27,27 +27,26 @@ const SeatsStyle = styled.div`
   }
   .row {
     flex-wrap: nowrap;
-    width: 670px;
     display: flex;
   }
   ${(props) => `display: ${props.display}`};
   border: 1px solid gray;
-  width: 670px;
+  width: 370px;
   padding-bottom: 10px;
+  align-items: start;
   .area {
-    height: 120px;
     flex-wrap: nowrap;
     display: flex;
-    width: 680px;
+    width: 350px;
     margin: 3px;
   }
   .blank-row {
-    margin-top: 22px;
+    margin-top: 11px;
   }
   .seats {
     overflow-y: auto;
-    height: 300px;
-    width: 670px;
+    height: 500px;
+    width: 370px;
     justify-content: center;
   }
 `;
@@ -76,12 +75,7 @@ function SeatsChooseComponents({ display, handleClick }) {
   };
 
   const getBGColor = (area, seat) => {
-    let color = area.color;
-    if (seat.color === "") {
-      color = area.color;
-    } else {
-      color = seat.color;
-    }
+    let color = seat.color;
     if (area.price !== parseInt(price)) {
       color = "#FFFFFF";
     }
@@ -96,7 +90,7 @@ function SeatsChooseComponents({ display, handleClick }) {
 
   const getTextColor = (area, seat) => {
     let color = "#000000"; //初始黑色
-    if (area.price !== parseInt(price)) {
+    if (seat.price !== parseInt(price)) {
       color = "#FFFFFF";
     }
     if (seat.price === parseInt(price)) {
@@ -161,9 +155,7 @@ function SeatsChooseComponents({ display, handleClick }) {
                           onClick={() => {
                             handleClick(seat);
                           }}
-                        >
-                          {seat.seat_num}
-                        </Col>
+                        ></Col>
                       ))}
                     </Row>
                   );
@@ -221,9 +213,7 @@ function SeatsChooseComponents({ display, handleClick }) {
                           onClick={() => {
                             handleClick(seat);
                           }}
-                        >
-                          {seat.seat_num}
-                        </Col>
+                        ></Col>
                       ))}
                     </Row>
                   );
@@ -261,9 +251,7 @@ function SeatsChooseComponents({ display, handleClick }) {
                           backgroundColor: getBGColor(area, seat),
                           color: getTextColor(area, seat),
                         }}
-                      >
-                        {seat.seat_num}
-                      </Col>
+                      ></Col>
                     ))}
                   </Row>
                 ));
@@ -312,9 +300,7 @@ function SeatsChooseComponents({ display, handleClick }) {
                           }}
                           key={`${rowIndex}-${seatIndex}`}
                           onClick={() => handleClick(seat)}
-                        >
-                          {seat.seat_num}
-                        </Col>
+                        ></Col>
                       ))}
                     </Row>
                   );
@@ -370,9 +356,7 @@ function SeatsChooseComponents({ display, handleClick }) {
                             color: getTextColor(area, seat),
                           }}
                           onClick={() => handleClick(seat)}
-                        >
-                          {seat.seat_num}
-                        </Col>
+                        ></Col>
                       ))}
                     </Row>
                   );
@@ -410,9 +394,7 @@ function SeatsChooseComponents({ display, handleClick }) {
                           backgroundColor: getBGColor(area, seat),
                           color: getTextColor(area, seat),
                         }}
-                      >
-                        {seat.seat_num}
-                      </Col>
+                      ></Col>
                     ))}
                   </Row>
                 ));
@@ -461,9 +443,7 @@ function SeatsChooseComponents({ display, handleClick }) {
                           }}
                           onClick={() => handleClick(seat)}
                           key={`${rowIndex}-${seatIndex}`}
-                        >
-                          {seat.seat_num}
-                        </Col>
+                        ></Col>
                       ))}
                     </Row>
                   );
@@ -519,9 +499,7 @@ function SeatsChooseComponents({ display, handleClick }) {
                             color: getTextColor(area, seat),
                           }}
                           onClick={() => handleClick(seat)}
-                        >
-                          {seat.seat_num}
-                        </Col>
+                        ></Col>
                       ))}
                     </Row>
                   );
@@ -559,9 +537,7 @@ function SeatsChooseComponents({ display, handleClick }) {
                           backgroundColor: getBGColor(area, seat),
                           color: getTextColor(area, seat),
                         }}
-                      >
-                        {seat.seat_num}
-                      </Col>
+                      ></Col>
                     ))}
                   </Row>
                 ));

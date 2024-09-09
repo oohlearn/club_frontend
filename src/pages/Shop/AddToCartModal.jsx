@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-import { Button, Modal, Image, Row, ConfigProvider, Select } from "antd";
+import { Button, Modal, Image, Row, ConfigProvider, Select, Col } from "antd";
 import styled from "styled-components";
 
 const ModalStyle = styled.div`
@@ -16,11 +16,8 @@ const ModalStyle = styled.div`
 const selectOptions = Array.from({ length: 11 }, (_, i) => ({ value: i, label: i }));
 
 // TODO OK按鈕刪掉
-const AddToCartModal = ({ loading, setOpen, open, product }) => {
+const AddToCartModal = ({ loading, setOpen, open, product, handleClick }) => {
   const [sizeOptions, setSizeOptions] = useState([]);
-  const handleClick = () => {
-    setOpen(false);
-  };
   useEffect(() => {
     if (product?.size_list) {
       const options = product.size_list.map((item) => ({
@@ -39,6 +36,7 @@ const AddToCartModal = ({ loading, setOpen, open, product }) => {
         onCancel={() => setOpen(false)}
         okText="加入購物車"
         cancelText="關閉視窗"
+        onOk={() => handleClick()}
       >
         <Image preview={false} width={200} src={product.index_image} />
         <h3>{product.title}</h3>
@@ -65,22 +63,10 @@ const AddToCartModal = ({ loading, setOpen, open, product }) => {
             fontWeight: "bold",
           }}
         >
-          尺寸：（不同尺寸或顏色，請分別加入購物車）
-          <ConfigProvider
-            theme={{
-              components: {
-                Select: { optionPadding: "15" },
-              },
-            }}
-          >
-            <Select className="sizeOption" size="small" options={sizeOptions}></Select>
-          </ConfigProvider>
+          尺寸：
+          <Col>（不同尺寸或顏色，請分別加入購物車）</Col>
+          <Select className="sizeOption" size="small" options={sizeOptions}></Select>
         </Row>
-        <Link>
-          <Button type="default" onClick={handleClick}>
-            加入購物車
-          </Button>
-        </Link>
       </Modal>
     </ModalStyle>
   );

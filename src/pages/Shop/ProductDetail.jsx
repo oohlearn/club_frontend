@@ -4,7 +4,7 @@ import TitleComponent from "../../components/TitleComponent";
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Image, Row, Col, Button, Divider, Select, ConfigProvider } from "antd";
+import { Image, Row, Col, Button, Divider, Select, ConfigProvider, message } from "antd";
 import styled from "styled-components";
 
 // TODO Get 商品資訊
@@ -31,8 +31,11 @@ const selectOptions = Array.from({ length: 11 }, (_, i) => ({ value: i, label: i
 function ProductDetail() {
   const [productData, setProductData] = useState({});
   const [sizeOptions, setSizeOptions] = useState([]);
+  const [cartItem, setCartItem] = useState([]);
+
   const apiUrl = process.env.REACT_APP_API_URL;
   const { productId } = useParams();
+
   const [loading, setLoading] = useState(true);
 
   const getProductDetail = async () => {
@@ -50,7 +53,7 @@ function ProductDetail() {
   useEffect(() => {
     if (productData.size_list) {
       const options = productData.size_list.map((item) => ({
-        label: `${item.size} ${item.description}`,
+        label: `${item.size} ${item.description ? item.description : ""}`,
         value: item.size,
       }));
       setSizeOptions(options);
@@ -63,6 +66,20 @@ function ProductDetail() {
   if (loading) {
     return <div>Loading...</div>;
   }
+  // 加入購物車
+  const handleClick = (product, qty, size) => {
+    setCartItem([
+      ...cartItem,
+      product,
+      // (newItem = {
+      //   product,
+      //   qty,
+      //   size,
+      // }),
+    ]);
+    message.success("成功加入購物車");
+    console.log(cartItem);
+  };
   return (
     <DetailStyle>
       <Row style={{ textAlign: "center", justifyContent: "center" }}>
@@ -138,8 +155,8 @@ function ProductDetail() {
               <Link to="/shop">
                 <Button type="default">看更多商品</Button>
               </Link>
-              <Button type="default">
-                <img src="images/cart.png" className="cartIcon" />
+              <Button type="default" onClick={() => handleClick(productData)}>
+                <image src="images/cart.png" className="cartIcon" />
                 加入購物車
               </Button>
             </Row>

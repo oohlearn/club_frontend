@@ -24,7 +24,6 @@ const TicketTable = ({ dataSource, handleTicketChange, resetTicketCounts }) => {
   const filteredDataSource = dataSource
     .filter((item, index, self) => index === self.findIndex((t) => t.price === item.price))
     .sort((a, b) => b.price - a.price);
-  const getPrice = filteredDataSource.map((item) => {});
   const columns = [
     {
       title: "種類",
@@ -43,9 +42,15 @@ const TicketTable = ({ dataSource, handleTicketChange, resetTicketCounts }) => {
       key: "help_words",
     },
     {
+      title: "剩餘票數",
+      dataIndex: "remain",
+      key: "remain",
+    },
+    {
       title: (
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ justifyContent: "center" }}>
           票數
+          <br />
           <Button onClick={resetTicketCounts} type="link" danger>
             清除資料
           </Button>
@@ -56,7 +61,7 @@ const TicketTable = ({ dataSource, handleTicketChange, resetTicketCounts }) => {
       render: (text, record) => (
         <Select
           defaultValue={0}
-          style={{ width: 120 }}
+          style={{ width: 80 }}
           options={selectOptions}
           value={record.ticket_amount}
           onChange={(value) => handleTicketChange(record.name, value)}
@@ -113,6 +118,7 @@ const TicketTable = ({ dataSource, handleTicketChange, resetTicketCounts }) => {
 function OpenAddressModal({ venue }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+
   const showLoading = () => {
     setOpen(true);
     setLoading(true);
@@ -164,6 +170,7 @@ function ActivityDetail() {
   const [dataSource, setDataSource] = useState([]);
   const apiUrl = process.env.REACT_APP_API_URL;
   const [loading, setLoading] = useState(true);
+  const [remainQtn, setRemainQtn] = useState([]);
 
   const getEventData = async () => {
     try {
@@ -180,6 +187,27 @@ function ActivityDetail() {
       setLoading(false); // 数据加载完成后或请求出错后设置 loading 为 false
     }
   };
+  const updateRemainSeats = async () => {
+    try {
+      for (const zone of eventData.zone) {
+        const unsoldSeats = zone.seat.filter((seat) => !seat.is_sold && !seat.not_sell).length;
+        await axios.patch(`${apiUrl}activity/events/${eventId}/zones/${zone.id}/update-remain/`, {
+          remain: unsoldSeats,
+        });
+      }
+      // 更新成功后重新获取事件数据
+      await getEventData();
+      console.log("更新成功");
+    } catch (error) {
+      console.error("更新剩余座位数时出错:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (eventData) {
+      updateRemainSeats();
+    }
+  }, []);
   useEffect(() => {
     getEventData();
   }, []);

@@ -1,26 +1,31 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Card, Col, ConfigProvider, Row, Select, Space, Flex, Divider, Button, Image } from "antd";
+import {
+  Card,
+  Col,
+  ConfigProvider,
+  Row,
+  Select,
+  message,
+  Space,
+  Flex,
+  Divider,
+  Button,
+  Image,
+} from "antd";
 import styled from "styled-components";
 import DOMPurify from "dompurify"; //清理HTML
 import axios from "axios";
 import AddToCartModal from "./AddToCartModal";
+import { PopMessage } from "../../components/PopMessage";
+import CartDrawer from "./CartDrawer.jsx";
 
 const ListStyle = styled.div`
   .link {
     text-decoration: none;
     text-align: start;
   }
-  .cartIcon {
-    height: 25px;
-    width: 25px;
-    top: 0;
-    display: flex;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.5);
-    cursor: "pointer";
-    position: absolute;
-  }
+
   .title {
     font-weight: 700;
   }
@@ -45,11 +50,14 @@ function OpenAddModal({ product }) {
   const showLoading = () => {
     setOpen(true);
     setLoading(true);
-
     // Simple loading mock. You should add cleanup logic in real world.
     setTimeout(() => {
       setLoading(false);
     }, 1000);
+  };
+  const handleClick = () => {
+    setOpen(false);
+    message.success("成功加入購物車！");
   };
   return (
     <CartIconStyled>
@@ -68,16 +76,22 @@ function OpenAddModal({ product }) {
       >
         <svg
           fill="white"
-          height="50"
-          viewBox="0 0 48 48"
-          width="50"
+          height="100"
+          // viewBox="0 0 48 48"
+          width="100"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path d="M0 0h48v48H0zm36.62 12L31.1 22z" fill="none" />
           <path d="M22 18h4v-6h6V8h-6V2h-4v6h-6v4h6v6zm-8 18c-2.21 0-3.98 1.79-3.98 4s1.77 4 3.98 4 4-1.79 4-4-1.79-4-4-4zm20 0c-2.21 0-3.98 1.79-3.98 4s1.77 4 3.98 4 4-1.79 4-4-1.79-4-4-4zm-19.65-6.5c0-.09.02-.17.06-.24l1.8-3.26h14.9c1.5 0 2.81-.83 3.5-2.06l7.72-14.02L38.83 8h-.01l-2.21 4-5.51 10H17.07l-.26-.54L12.32 12l-1.9-4-1.89-4H2v4h4l7.2 15.17-2.71 4.9c-.31.58-.49 1.23-.49 1.93 0 2.21 1.79 4 4 4h24v-4H14.85c-.28 0-.5-.22-.5-.5z" />
         </svg>
       </div>
-      <AddToCartModal product={product} loading={loading} setOpen={setOpen} open={open} />
+      <AddToCartModal
+        handleClick={handleClick}
+        product={product}
+        loading={loading}
+        setOpen={setOpen}
+        open={open}
+      />
     </CartIconStyled>
   );
 }
@@ -85,26 +99,10 @@ function OpenAddModal({ product }) {
 const { Meta } = Card;
 const selectOptions = Array.from({ length: 11 }, (_, i) => ({ value: i, label: i }));
 
-function ProductComponent() {
-  const [productsData, setProductsData] = useState([]);
-  const apiUrl = process.env.REACT_APP_API_URL;
-
-  const getProductsData = async () => {
-    try {
-      const response = await axios.get(`${apiUrl}shopping/products/`);
-      console.log(response.data);
-      setProductsData(response.data.products);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    getProductsData();
-  }, []);
+function ProductComponent({ productsData }) {
   return (
     <ListStyle>
-      <Row justify="space-around">
+      <Row justify="space-between">
         {productsData.map((product) => (
           <Col key={product.id} span={12}>
             <ConfigProvider
@@ -155,6 +153,47 @@ function ProductComponent() {
   );
 }
 
+const CartStyle = styled.div`
+  border: 1px solid black;
+`;
+function ShopComponent() {
+  const [productsData, setProductsData] = useState([]);
+  const [cartItem, setCartItem] = useState([]);
+  const apiUrl = process.env.REACT_APP_API_URL;
+
+  const getProductsData = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}shopping/products/`);
+      console.log(response.data);
+      setProductsData(response.data.products);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleRemoveItem = (itemToRemove, removeId) => {
+    setCartItem(cartItem.filter((item) => item.id !== removeId));
+  };
+
+  useEffect(() => {
+    getProductsData();
+  }, []);
+  return (
+    <>
+      <Row justify={"space-between"}>
+        <Col span={10}>
+          <ProductComponent productsData={productsData} />
+        </Col>
+      </Row>
+      <Col span={12} push={2}>
+        <Col span={12} push={2}>
+          <CartDrawer cartItem={cartItem} />
+        </Col>
+      </Col>
+    </>
+  );
+}
+//
 const ShoppingListComponent = () => (
   <Flex align="center" gap="middle" justify="center">
     <Col span={1}>
@@ -216,26 +255,4 @@ const ShoppingList = () => (
   </Space>
 );
 
-function ShopComponent() {
-  return (
-    <>
-      <Flex>
-        <Col span={18}>
-          <ProductComponent />
-        </Col>
-        {/* <Col span={10}>
-          <ShoppingList />
-          <Flex justify="end" gap="large">
-            <Link to="/activities">
-              <Button type="default">要購票嗎？</Button>
-            </Link>
-            <Link to="checkout">
-              <Button type="primary">結帳囉！</Button>
-            </Link>
-          </Flex>
-        </Col> */}
-      </Flex>
-    </>
-  );
-}
 export default ShopComponent;

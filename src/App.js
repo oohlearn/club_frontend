@@ -20,38 +20,41 @@ import Checkout from "./pages/Order/Checkout";
 import ProductDetail from "./pages/Shop/ProductDetail";
 import Login from "./pages/Members/Login";
 import Register from "./pages/Members/Register";
+import { CartProvider } from "./context/CartContext";
 
 function App() {
   return (
     <div className="App">
-      <Routes>
-        <Route path="/" element={<FrontLayout />}>
-          <Route path="" element={<Home />}></Route>
-          <Route path="login" element={<Login />}></Route>
-          <Route path="register" element={<Register />}></Route>
+      <CartProvider>
+        <Routes>
+          <Route path="/" element={<FrontLayout />}>
+            <Route path="" element={<Home />}></Route>
+            <Route path="login" element={<Login />}></Route>
+            <Route path="register" element={<Register />}></Route>
 
-          <Route path="intro" element={<IntroPage />}>
-            <Route path="" element={<IntroHome />}></Route>
-            <Route path="experiences" element={<ExperiencesPage />}></Route>
-            <Route path="conductors" element={<Conductors />}></Route>
-            <Route path="teachers" element={<Teachers />}></Route>
+            <Route path="intro" element={<IntroPage />}>
+              <Route path="" element={<IntroHome />}></Route>
+              <Route path="experiences" element={<ExperiencesPage />}></Route>
+              <Route path="conductors" element={<Conductors />}></Route>
+              <Route path="teachers" element={<Teachers />}></Route>
+            </Route>
+
+            <Route path="videos" element={<Videos />}></Route>
+            <Route path="albums" element={<Albums />}></Route>
+            <Route path="albums/:albumId" element={<AlbumDetail />}></Route>
+            <Route path="news" element={<News />}></Route>
+            <Route path="news/:newsId" element={<NewsDetail />}></Route>
+            <Route path="contact" element={<Contact />}></Route>
+
+            <Route path="activities" element={<Activities />}></Route>
+            <Route path="activities/:eventId" element={<ActivityDetail />}></Route>
+            <Route path="activities/:eventId/choose_seats/:price" element={<ChooseSeats />}></Route>
+            <Route path="shop" element={<Shop />}></Route>
+            <Route path="shop/:productId" element={<ProductDetail />}></Route>
+            <Route path="shop/checkout" element={<Checkout />}></Route>
           </Route>
-          {/* sidebar */}
-          <Route path="activities" element={<Activities />}></Route>
-          <Route path="activities/:eventId" element={<ActivityDetail />}></Route>
-          <Route path="activities/:eventId/choose_seats/:price" element={<ChooseSeats />}></Route>
-          <Route path="videos" element={<Videos />}></Route>
-          <Route path="albums" element={<Albums />}></Route>
-          <Route path="albums/:albumId" element={<AlbumDetail />}></Route>
-          <Route path="news" element={<News />}></Route>
-          <Route path="news/:newsId" element={<NewsDetail />}></Route>
-          {/* Navbar */}
-          <Route path="contact" element={<Contact />}></Route>
-          <Route path="shop" element={<Shop />}></Route>
-          <Route path="shop/:productId" element={<ProductDetail />}></Route>
-          <Route path="shop/checkout" element={<Checkout />}></Route>
-        </Route>
-      </Routes>
+        </Routes>
+      </CartProvider>
     </div>
   );
 }

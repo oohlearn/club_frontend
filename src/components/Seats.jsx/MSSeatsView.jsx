@@ -1,9 +1,7 @@
 import { Row, Col } from "antd";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
-import axios from "axios";
-import { useParams } from "react-router-dom";
-const apiUrl = process.env.REACT_APP_API_URL;
+import { EventContext } from "../../pages/Activities/ActivityDetail";
 
 const SeatsStyle = styled.div`
   .seat {
@@ -52,20 +50,17 @@ const SeatsStyle = styled.div`
   }
 `;
 
-function SeatsViewComponents({ display, handleClick }) {
+function SeatsViewComponents({ display }) {
   const [seatsData, setSeatsData] = useState([]);
-  const [eventData, setEventData] = useState({});
-  const { eventId } = useParams();
+  const { eventData } = useContext(EventContext);
 
   const getData = async () => {
     try {
-      const response = await axios.get(`${apiUrl}activity/events/${eventId}/`);
-
-      if (response.data.zone.length === 0) {
-        setSeatsData(response.data.zoneForNumberRow);
+      if (eventData.zone.length === 0) {
+        setSeatsData(eventData.zoneForNumberRow);
         console.log(seatsData);
       } else {
-        setSeatsData(response.data.zone);
+        setSeatsData(eventData.zone);
         console.log(seatsData);
       }
       console.log(eventData);
@@ -74,7 +69,7 @@ function SeatsViewComponents({ display, handleClick }) {
     }
   };
 
-  const getBGColor = (area, seat) => {
+  const getBGColor = (seat) => {
     let color = seat.color;
     if (seat.not_sell || seat.is_sold) {
       color = "#ADADAD";
@@ -82,7 +77,7 @@ function SeatsViewComponents({ display, handleClick }) {
     return color;
   };
 
-  const getTextColor = (area, seat) => {
+  const getTextColor = (seat) => {
     let color = "#000000"; //初始黑色
     if (seat.not_sell || seat.is_sold) {
       color = "#ADADAD";
@@ -136,8 +131,8 @@ function SeatsViewComponents({ display, handleClick }) {
                         <Col
                           className="seat"
                           style={{
-                            backgroundColor: getBGColor(area, seat),
-                            color: getTextColor(area, seat),
+                            backgroundColor: getBGColor(seat),
+                            color: getTextColor(seat),
                           }}
                           key={`seat-${rowIndex}-${seatIndex}`}
                         >
@@ -194,8 +189,8 @@ function SeatsViewComponents({ display, handleClick }) {
                           className="seat"
                           key={`${rowIndex}-${seatIndex}`}
                           style={{
-                            backgroundColor: getBGColor(area, seat),
-                            color: getTextColor(area, seat),
+                            backgroundColor: getBGColor(seat),
+                            color: getTextColor(seat),
                           }}
                         >
                           {seat.seat_num}
@@ -233,8 +228,8 @@ function SeatsViewComponents({ display, handleClick }) {
                         className="seat"
                         key={seatIndex}
                         style={{
-                          backgroundColor: getBGColor(area, seat),
-                          color: getTextColor(area, seat),
+                          backgroundColor: getBGColor(seat),
+                          color: getTextColor(seat),
                         }}
                       >
                         {seat.seat_num}
@@ -282,8 +277,8 @@ function SeatsViewComponents({ display, handleClick }) {
                         <Col
                           className="seat"
                           style={{
-                            backgroundColor: getBGColor(area, seat),
-                            color: getTextColor(area, seat),
+                            backgroundColor: getBGColor(seat),
+                            color: getTextColor(seat),
                           }}
                           key={`${rowIndex}-${seatIndex}`}
                         >
@@ -340,8 +335,8 @@ function SeatsViewComponents({ display, handleClick }) {
                           className="seat"
                           key={`${rowIndex}-${seatIndex}`}
                           style={{
-                            backgroundColor: getBGColor(area, seat),
-                            color: getTextColor(area, seat),
+                            backgroundColor: getBGColor(seat),
+                            color: getTextColor(seat),
                           }}
                         >
                           {seat.seat_num}
@@ -379,8 +374,8 @@ function SeatsViewComponents({ display, handleClick }) {
                         className="seat"
                         key={seatIndex}
                         style={{
-                          backgroundColor: getBGColor(area, seat),
-                          color: getTextColor(area, seat),
+                          backgroundColor: getBGColor(seat),
+                          color: getTextColor(seat),
                         }}
                       >
                         {seat.seat_num}
@@ -428,8 +423,8 @@ function SeatsViewComponents({ display, handleClick }) {
                         <Col
                           className="seat"
                           style={{
-                            backgroundColor: getBGColor(area, seat),
-                            color: getTextColor(area, seat),
+                            backgroundColor: getBGColor(seat),
+                            color: getTextColor(seat),
                           }}
                           key={`${rowIndex}-${seatIndex}`}
                         >
@@ -486,8 +481,8 @@ function SeatsViewComponents({ display, handleClick }) {
                           className="seat"
                           key={`${rowIndex}-${seatIndex}`}
                           style={{
-                            backgroundColor: getBGColor(area, seat),
-                            color: getTextColor(area, seat),
+                            backgroundColor: getBGColor(seat),
+                            color: getTextColor(seat),
                           }}
                         >
                           {seat.seat_num}
@@ -525,8 +520,8 @@ function SeatsViewComponents({ display, handleClick }) {
                         className="seat"
                         key={seatIndex}
                         style={{
-                          backgroundColor: getBGColor(area, seat),
-                          color: getTextColor(area, seat),
+                          backgroundColor: getBGColor(seat),
+                          color: getTextColor(seat),
                         }}
                       >
                         {seat.seat_num}

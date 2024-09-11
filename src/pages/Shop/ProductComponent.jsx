@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import {
   Card,
@@ -15,11 +15,9 @@ import {
 } from "antd";
 import styled from "styled-components";
 import DOMPurify from "dompurify"; //清理HTML
-import axios from "axios";
-import AddToCartModal from "./AddToCartModal";
-import { PopMessage } from "../../components/PopMessage";
-import CartDrawer from "./CartDrawer.jsx";
-
+import AddToCartModal from "./AddToCartModal.jsx";
+import { PopMessage } from "../../components/PopMessage.jsx";
+import { ProductsContext } from "../../context/ProductContext.jsx";
 const ListStyle = styled.div`
   .link {
     text-decoration: none;
@@ -153,106 +151,4 @@ function ProductComponent({ productsData }) {
   );
 }
 
-const CartStyle = styled.div`
-  border: 1px solid black;
-`;
-function ShopComponent() {
-  const [productsData, setProductsData] = useState([]);
-  const [cartItem, setCartItem] = useState([]);
-  const apiUrl = process.env.REACT_APP_API_URL;
-
-  const getProductsData = async () => {
-    try {
-      const response = await axios.get(`${apiUrl}shopping/products/`);
-      console.log(response.data);
-      setProductsData(response.data.products);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleRemoveItem = (itemToRemove, removeId) => {
-    setCartItem(cartItem.filter((item) => item.id !== removeId));
-  };
-
-  useEffect(() => {
-    getProductsData();
-  }, []);
-  return (
-    <>
-      <Row justify={"space-between"}>
-        <Col span={10}>
-          <ProductComponent productsData={productsData} />
-        </Col>
-      </Row>
-      <Col span={12} push={2}>
-        <Col span={12} push={2}>
-          <CartDrawer cartItem={cartItem} />
-        </Col>
-      </Col>
-    </>
-  );
-}
-//
-const ShoppingListComponent = () => (
-  <Flex align="center" gap="middle" justify="center">
-    <Col span={1}>
-      <a href="#" style={{ textDecoration: "none" }}>
-        X
-      </a>
-    </Col>
-    <Col span={2}>
-      <img src="/images/logo.jpg" alt="" width={"30px"} />
-    </Col>
-    <Col span={9} offset={1}>
-      <Col>2023演出DVD</Col>
-      <Col style={{ color: "gray", fontSize: "small" }}>NT$150</Col>
-    </Col>
-    <Col span={5}>
-      <ConfigProvider
-        theme={{
-          components: {
-            Select: { optionPadding: 5 },
-          },
-        }}
-      >
-        <Select size="small" defaultValue={0} options={selectOptions}></Select>
-      </ConfigProvider>
-    </Col>
-    <Col span={6}>小計：300</Col>
-  </Flex>
-);
-
-const ShoppingList = () => (
-  <Space direction="vertical" size={16}>
-    <Card
-      title="我的購物車"
-      extra={<a href="#">More</a>}
-      style={{
-        width: 360,
-        background: "yellow",
-      }}
-    >
-      {Array.from({ length: 3 }).map((_, index) => (
-        <ShoppingListComponent />
-      ))}
-      <br />
-      <Row>
-        <Col span={17}>
-          <Col>宅配運費</Col>
-          <Col style={{ color: "gray", fontSize: "small" }}>（周邊商品滿500元，免運費）</Col>
-        </Col>
-        <Col span={6} offset={1}>
-          小計：70
-        </Col>
-      </Row>
-
-      <Divider />
-      <Row justify={"end"}>
-        <Col>總金額： NT$ 300</Col>
-      </Row>
-    </Card>
-  </Space>
-);
-
-export default ShopComponent;
+export default ProductComponent;

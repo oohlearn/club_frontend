@@ -1,9 +1,12 @@
 import styled from "styled-components";
 import TitleComponent from "../../components/TitleComponent";
 import PaginationComponent from "../../components/Pagenation";
-import React, { useState } from "react";
-import { Input, Space, Button, Col, Row, Select } from "antd";
-import ShopComponent from "./ShopComponent";
+import React, { useState, useEffect, useContext } from "react";
+import { Input, Space, Button, Col, Row, Select, message } from "antd";
+import CartDrawer from "./CartDrawer";
+import axios from "axios";
+import ProductComponent from "./ProductComponent";
+import { useCart } from "../../context/CartContext";
 
 const StylePagination = styled.div`
   display: flex;
@@ -79,8 +82,25 @@ const CategorySearchBar = () => {
     </Space>
   );
 };
-
+// TODO整理商品頁面
 function Shop() {
+  const [productsData, setProductsData] = useState([]);
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const { cartItems, removeFromCart } = useCart();
+
+  const getProductsData = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}shopping/products/`);
+      console.log(response.data);
+      setProductsData(response.data.products);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    getProductsData();
+  }, []);
+
   return (
     <>
       <TitleComponent label="周邊商品" />
@@ -92,8 +112,16 @@ function Shop() {
         <SearchBar />
       </Row>
       <br />
-      <ShopComponent />
 
+      <Row>
+        <Col span={12}>
+          <ProductComponent productsData={productsData} />
+        </Col>
+
+        <Col span={10} push={1}>
+          <CartDrawer cartItems={cartItems} removeFromCart={removeFromCart} />
+        </Col>
+      </Row>
       <StylePagination>
         <PaginationComponent />
       </StylePagination>

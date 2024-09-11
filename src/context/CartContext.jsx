@@ -46,12 +46,24 @@ export function CartProvider({ children }) {
     );
   };
 
+  const getTotalAmount = () => {
+    if (!cartItems || cartItems.length === 0) {
+      return 0; // 當 cartItem 為 undefined 或空陣列時，總金額設為 0
+    }
+    return cartItems.reduce((total, item) => {
+      const price = item.on_discount ? item.discount_price : item.price;
+      return total + price * item.details.qty;
+    }, 0);
+  };
+
   const clearCart = () => {
     setCartItems([]);
   };
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, clearCart }}>
+    <CartContext.Provider
+      value={{ cartItems, addToCart, removeFromCart, clearCart, getTotalAmount }}
+    >
       {children}
     </CartContext.Provider>
   );

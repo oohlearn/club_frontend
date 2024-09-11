@@ -38,7 +38,7 @@ const DetailStyle = styled.div`
   }
 `;
 
-const CartDrawer = ({ cartItems, removeFromCart }) => {
+const CartDrawer = ({ cartItems, removeFromCart, getTotalAmount, productId }) => {
   const [open, setOpen] = useState(false);
 
   const showDrawer = () => {
@@ -50,23 +50,14 @@ const CartDrawer = ({ cartItems, removeFromCart }) => {
   };
 
   useEffect(() => {
-    if (cartItems) {
-      if (cartItems.length > 0) {
+    if (cartItems && cartItems.length > 0) {
+      const productExists = cartItems.some((item) => item.id === productId);
+      if (productExists) {
         setOpen(true);
       }
     }
     console.log({ cartItems });
   }, [cartItems]);
-
-  const getTotalAmount = () => {
-    if (!cartItems || cartItems.length === 0) {
-      return 0; // 當 cartItem 為 undefined 或空陣列時，總金額設為 0
-    }
-    return cartItems.reduce((total, item) => {
-      const price = item.on_discount ? item.discount_price : item.price;
-      return total + price * item.details.qty;
-    }, 0);
-  };
 
   const containerStyle = {
     position: "relative",
@@ -92,27 +83,29 @@ const CartDrawer = ({ cartItems, removeFromCart }) => {
         <div style={containerStyle}>
           <Drawer
             title="購物車"
-            width={"100%"}
+            width={400}
             height={200}
             onClose={onClose}
             open={open}
-            placement="top"
+            placement="right"
             extra={
               <>
                 <Link to="/activities">
                   <Button style={{ marginRight: "20px" }}>購票</Button>
                 </Link>
-                <Button type="primary">結帳</Button>
+                <Link to="/shop/checkout">
+                  <Button type="primary">結帳</Button>
+                </Link>
               </>
             }
           >
             <Row>
-              <Col span={12}>
+              <Col>
                 <List
                   dataSource={cartItems}
                   renderItem={(item) => (
                     <List.Item>
-                      <div>
+                      <div style={{ marginRight: "1px" }}>
                         <Button
                           onClick={() => removeFromCart(item.id, item.details.size, item.index)}
                           size="small"
@@ -120,9 +113,9 @@ const CartDrawer = ({ cartItems, removeFromCart }) => {
                           X
                         </Button>
                       </div>
-                      <span>{item.name}</span>
-                      <span>{item.details.qty}件</span>
-                      <span>
+                      <span style={{ margin: "5px" }}>{item.name}</span>
+                      <span>{item.details.qty} 件</span>
+                      <span style={{ margin: "0 20px" }}>
                         <span>尺寸：{item.details.size || "單一尺寸"}</span>
                         <br />
                         <span>單價：NT$ {item.on_discount ? item.discount_price : item.price}</span>
@@ -131,11 +124,9 @@ const CartDrawer = ({ cartItems, removeFromCart }) => {
                   )}
                 />
               </Col>
-              <Col span={10} push={2}>
-                <Divider />
-                <h5>總金額：NT$ {getTotalAmount()} </h5>
-                <p>商品及票券總金額超過500元，免運費100元</p>
-              </Col>
+              <Divider />
+              <h5>總金額：NT$ {getTotalAmount()} </h5>
+              <p>商品及票券總金額超過500元，免運費100元</p>
             </Row>
           </Drawer>
         </div>
@@ -154,7 +145,7 @@ function ProductDetail() {
   const [selectedSize, setSelectedSize] = useState("");
   const apiUrl = process.env.REACT_APP_API_URL;
   const { productId } = useParams();
-  const { addToCart, cartItems, removeFromCart } = useCart();
+  const { addToCart, cartItems, removeFromCart, getTotalAmount } = useCart();
 
   const getProductDetail = async () => {
     try {
@@ -277,7 +268,12 @@ function ProductDetail() {
                 <image src="images/cart.png" className="cartIcon" />
                 加入購物車
               </Button>
-              <CartDrawer cartItems={cartItems} removeFromCart={removeFromCart} />
+              <CartDrawer
+                cartItems={cartItems}
+                removeFromCart={removeFromCart}
+                getTotalAmount={getTotalAmount}
+                productId={productId}
+              />
             </Row>
           </Col>
         </Col>

@@ -4,6 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button, Col, Row, Select, Steps, message, theme } from "antd";
 import { SecondStep } from "../../components/SecondStep";
 import { ThirdStep } from "../../components/ThirdStep";
+import { useCart } from "../../context/CartContext";
+import { useTicketCart } from "../../context/TicketCartContext";
 
 const current = 0;
 
@@ -14,15 +16,17 @@ const orderData = [
   },
 ];
 
-const StepsComponent = ({ orderData, newOrder }) => {
+// TODO 票券和商品的優惠碼欄位
+
+const StepsComponent = ({ cartItems }) => {
   const steps = [
     {
       title: "確認訂單內容",
-      content: <SecondStep orderData={orderData} newOrder={newOrder} />,
+      content: <SecondStep cartItems={cartItems} />,
     },
     {
       title: "填寫訂購人資料及繳費",
-      content: <ThirdStep orderData={orderData} newOrder={newOrder} />,
+      content: <ThirdStep cartItems={cartItems} />,
     },
   ];
   const { token } = theme.useToken();
@@ -49,8 +53,8 @@ const StepsComponent = ({ orderData, newOrder }) => {
       <Steps
         current={current}
         items={items}
+        cartItems={cartItems}
         orderData={orderData}
-        newOrder={newOrder}
         style={{ width: "60%", marginLeft: "50px" }}
       />
       <div style={contentStyle}>{steps[current].content}</div>
@@ -89,11 +93,7 @@ const StepsComponent = ({ orderData, newOrder }) => {
 
 function Checkout() {
   const navigate = useNavigate();
-  const [orderData, setOrderData] = useState({
-    index: "",
-    items: [],
-    totalPrice: "",
-  });
+  const { cartItems, removeFromCart, getTotalAmount } = useCart();
 
   // 检查 Data 是否存在
   if (!orderData) {
@@ -104,7 +104,12 @@ function Checkout() {
 
   return (
     <>
-      <StepsComponent current={current} orderData={orderData} />
+      <StepsComponent
+        current={current}
+        removeFromCart={removeFromCart}
+        cartItems={cartItems}
+        getTotalAmount={getTotalAmount}
+      />
       <br />
     </>
   );

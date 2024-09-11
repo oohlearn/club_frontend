@@ -1,8 +1,20 @@
 import styled from "styled-components";
 import React, { useState } from "react";
-import { Col, Row, Card, Divider, Space, Flex, Button, Select, ConfigProvider } from "antd";
+import { Col, Row, List, Card, Divider, Space, Flex, Button, Select, ConfigProvider } from "antd";
 
 import { Link } from "react-router-dom";
+import { useCart } from "../context/CartContext";
+import DiscountInput from "./Discount_code";
+
+const ListItem = styled(List.Item)`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const CardStyle = styled(Card)`
+  background: orange;
+  width: 450px;
+`;
 
 const selectOptions = Array.from({ length: 11 }, (_, i) => ({ value: i, label: i }));
 
@@ -34,38 +46,42 @@ const ShoppingListComponent = () => (
     <Col span={6}>小計：300</Col>
   </Flex>
 );
-
-const ShoppingList = () => (
+const ShoppingList = ({ cartItems, removeFromCart, getTotalAmount }) => (
   <Flex vertical gap="middle" justify="center">
-    <Card
-      title="我的購物車"
-      extra={<a href="#">More</a>}
-      style={{
-        width: 450,
-        background: "gray",
-      }}
-    >
-      {Array.from({ length: 3 }).map((_, index) => (
-        <ShoppingListComponent key={index} />
-      ))}
-      <Row>
-        {/* <Route path="shop" element={<Shop />}></Route> */}
-        <Col span={16} offset={2}>
-          <Col>宅配運費</Col>
-          <Col style={{ color: "gray", fontSize: "small" }}>
-            （周邊商品滿500元或購買任一演出票券，免運費）
-          </Col>
-        </Col>
-        <Col span={6} push={2}>
-          小計：70
-        </Col>
-      </Row>
-
+    <h5>費用說明</h5>
+    <div>
+      <h6>商品及票券總金額超過500元，免運費100元</h6>
+    </div>
+    <CardStyle title="周邊商品">
+      <List
+        dataSource={cartItems}
+        renderItem={(item) => (
+          <ListItem>
+            <span>
+              <Button
+                onClick={() => removeFromCart(item.id, item.details.size, item.index)}
+                size="small"
+              >
+                X
+              </Button>
+            </span>
+            <span style={{ margin: "0 10px" }}>{item.name}</span>
+            <span style={{ margin: "0 10px" }}>{item.details.qty} 件</span>
+            <span style={{ marginLeft: "20px" }}>
+              <Col>尺寸：{item.details.size || "單一尺寸"}</Col>
+              <Col>單價：NT$ {item.on_discount ? item.discount_price : item.price}</Col>
+            </span>
+          </ListItem>
+        )}
+      />
       <Divider />
-      <Row justify={"end"}>
-        <Col>總金額： NT$ 300</Col>
+      <Row justify={"start"}>
+        <DiscountInput />
       </Row>
-    </Card>
+      <Row justify={"end"}>
+        <h6>總金額：NT$ {getTotalAmount()} </h6>
+      </Row>
+    </CardStyle>
   </Flex>
 );
 
@@ -131,10 +147,15 @@ const TicketList = () => (
 );
 
 export const SecondStep = () => {
+  const { cartItems, removeFromCart, getTotalAmount } = useCart();
   return (
-    <Row style={{ marginTop: "10ox" }}>
+    <Row style={{ marginTop: "10px" }}>
       <Col span={16} offset={2}>
-        <ShoppingList />
+        <ShoppingList
+          cartItems={cartItems}
+          removeFromCart={removeFromCart}
+          getTotalAmount={getTotalAmount}
+        />
         <br />
         <TicketList />
       </Col>

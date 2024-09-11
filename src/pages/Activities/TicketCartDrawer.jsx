@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Button, Drawer, Radio, Space, List, Divider, ConfigProvider } from "antd";
 import styled from "styled-components";
 const TicketCartDrawer = ({ choiceSeats, onRemoveSeat }) => {
@@ -55,7 +56,11 @@ const TicketCartDrawer = ({ choiceSeats, onRemoveSeat }) => {
             onClose={onClose}
             open={open}
             mask={false}
-            extra={<Button>結帳</Button>}
+            extra={
+              <Link to="/shop/checkout">
+                <Button>結帳</Button>
+              </Link>
+            }
           >
             <List
               dataSource={choiceSeats}

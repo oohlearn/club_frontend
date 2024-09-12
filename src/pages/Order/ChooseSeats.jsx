@@ -20,6 +20,7 @@ import { ThirdStep } from "../../components/ThirdStep";
 import SeatsChooseComponents from "../../components/Seats.jsx/MSChoiceSeats";
 import TicketCartDrawer from "../Activities/TicketCartDrawer";
 import { PopMessage } from "../../components/PopMessage";
+import { useTicketCart } from "../../context/TicketCartContext";
 
 const SeatsViewStyle = styled.div`
   .seat {
@@ -107,9 +108,9 @@ function ChooseSeats() {
   const { eventId } = useParams();
   const [eventData, setEventData] = useState({});
   const [loading, setLoading] = useState(true);
-  const [choiceSeats, setChoiceSeats] = useState([]);
-  const [choicePrice, setChoicePrice] = useState();
-
+  // const [choiceSeats, setChoiceSeats] = useState([]);
+  // const [choicePrice, setChoicePrice] = useState();
+  const { choiceSeats, getPrice, addToTicketCart, removeTicketFromCart } = useTicketCart();
   const { price } = useParams();
   const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -124,9 +125,6 @@ function ChooseSeats() {
       setLoading(false); // 数据加载完成后或请求出错后设置 loading 为 false
     }
   };
-  const getPrice = (price) => {
-    setChoicePrice(parseInt(price));
-  };
 
   useEffect(() => {
     getEventData();
@@ -136,30 +134,30 @@ function ChooseSeats() {
     return <div>Loading...</div>;
   }
 
-  const handleRemoveSeat = (seatToRemove) => {
-    setChoiceSeats(choiceSeats.filter((seat) => seat.seat_num !== seatToRemove.seat_num));
-  };
-  const handleClick = (seat) => {
-    // 获取之前选择的座位
-    // 检查座位是否已经存在于选择中
-    if (seat.price === choicePrice) {
-      const seatIndex = choiceSeats.findIndex(
-        (existingSeat) => existingSeat.seat_num === seat.seat_num
-      );
-      if (seatIndex === -1) {
-        // 如果座位不在选择中，则添加它
-        setChoiceSeats([...choiceSeats, seat]);
-      } else {
-        // 如果座位已在选择中，则从选择中移除它
-        const newChoiceSeats = [...choiceSeats];
-        newChoiceSeats.splice(seatIndex, 1);
-        setChoiceSeats(newChoiceSeats);
-      }
-    } else {
-      message.warning("請選擇相對應的票區");
-    }
-    console.log(choiceSeats);
-  };
+  // const handleRemoveSeat = (seatToRemove) => {
+  //   setChoiceSeats(choiceSeats.filter((seat) => seat.seat_num !== seatToRemove.seat_num));
+  // };
+  // const handleClick = (seat) => {
+  //   // 获取之前选择的座位
+  //   // 检查座位是否已经存在于选择中
+  //   if (seat.price === choicePrice) {
+  //     const seatIndex = choiceSeats.findIndex(
+  //       (existingSeat) => existingSeat.seat_num === seat.seat_num
+  //     );
+  //     if (seatIndex === -1) {
+  //       // 如果座位不在选择中，则添加它
+  //       setChoiceSeats([...choiceSeats, seat]);
+  //     } else {
+  //       // 如果座位已在选择中，则从选择中移除它
+  //       const newChoiceSeats = [...choiceSeats];
+  //       newChoiceSeats.splice(seatIndex, 1);
+  //       setChoiceSeats(newChoiceSeats);
+  //     }
+  //   } else {
+  //     message.warning("請選擇相對應的票區");
+  //   }
+  //   console.log(choiceSeats);
+  // };
 
   return (
     <>
@@ -184,14 +182,14 @@ function ChooseSeats() {
             <SeatsViewStyle>
               <SeatsChooseComponents
                 event={eventData}
-                handleClick={handleClick}
+                handleClick={addToTicketCart}
                 display={eventData.ticket_system_url ? "none" : "block"}
               />
             </SeatsViewStyle>
           </Col>
         </Row>
         <Col span={12} push={2}>
-          <TicketCartDrawer choiceSeats={choiceSeats} onRemoveSeat={handleRemoveSeat} />
+          <TicketCartDrawer choiceSeats={choiceSeats} onRemoveSeat={removeTicketFromCart} />
         </Col>
       </Row>
     </>

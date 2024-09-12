@@ -18,11 +18,11 @@ const orderData = [
 
 // TODO 票券和商品的優惠碼欄位
 
-const StepsComponent = ({ cartItems }) => {
+const StepsComponent = ({ cartItems, choiceSeats }) => {
   const steps = [
     {
       title: "確認訂單內容",
-      content: <SecondStep cartItems={cartItems} />,
+      content: <SecondStep cartItems={cartItems} choiceSeats={choiceSeats} />,
     },
     {
       title: "填寫訂購人資料及繳費",
@@ -94,6 +94,7 @@ const StepsComponent = ({ cartItems }) => {
 function Checkout() {
   const navigate = useNavigate();
   const { cartItems, removeFromCart, getTotalAmount } = useCart();
+  const { choiceSeats, removeTicketFromCart } = useTicketCart();
 
   // 检查 Data 是否存在
   if (!orderData) {
@@ -107,6 +108,8 @@ function Checkout() {
       <StepsComponent
         current={current}
         removeFromCart={removeFromCart}
+        removeTicketFromCart={removeTicketFromCart}
+        choiceSeats={choiceSeats}
         cartItems={cartItems}
         getTotalAmount={getTotalAmount}
       />

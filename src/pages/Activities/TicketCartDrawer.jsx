@@ -2,8 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button, Drawer, Radio, Space, List, Divider, ConfigProvider } from "antd";
 import styled from "styled-components";
-const TicketCartDrawer = ({ choiceSeats, onRemoveSeat }) => {
+import { useTicketCart } from "../../context/TicketCartContext";
+
+const TicketCartDrawer = () => {
   const [open, setOpen] = useState(false);
+  const { choiceSeats, removeTicketFromCart } = useTicketCart();
   const showDrawer = () => {
     if (open) {
       setOpen(false);
@@ -66,7 +69,7 @@ const TicketCartDrawer = ({ choiceSeats, onRemoveSeat }) => {
               dataSource={choiceSeats}
               renderItem={(seat) => (
                 <List.Item>
-                  <Button onClick={() => onRemoveSeat(seat)} size="small">
+                  <Button onClick={() => removeTicketFromCart(seat)} size="small">
                     X
                   </Button>
                   <h6>

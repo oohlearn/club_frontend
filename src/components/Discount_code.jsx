@@ -1,37 +1,20 @@
-import React from "react";
-import { Button, Checkbox, Form, Input } from "antd";
-const onFinish = (values) => {
-  console.log("Success:", values);
+import React, { useEffect, useState } from "react";
+import { Button, Checkbox, Form, Input, message, Space } from "antd";
+import { useCart } from "../context/CartContext";
+import { useTicketCart } from "../context/TicketCartContext";
+
+// TODO目前優惠碼無法區分不同場活動
+const DiscountInput = () => {
+  const { applyDiscountCode, discountCode, getInput } = useTicketCart();
+  return (
+    <Space>
+      <Input
+        placeholder="輸入優惠碼"
+        value={discountCode}
+        onChange={(e) => getInput(e.target.value)}
+      />
+      <Button onClick={applyDiscountCode}>應用優惠</Button>
+    </Space>
+  );
 };
-const onFinishFailed = (errorInfo) => {
-  console.log("Failed:", errorInfo);
-};
-// TODO待修改成一排
-const DiscountInput = () => (
-  <Form
-    style={{
-      maxWidth: "none",
-    }}
-    initialValues={{
-      remember: true,
-    }}
-    onFinish={onFinish}
-    onFinishFailed={onFinishFailed}
-    autoComplete="off"
-  >
-    <Form.Item
-      label="優惠碼"
-      name="discount_code"
-      labelCol={{ span: 6 }} // 控制 label 的寬度
-      wrapperCol={{ span: 10 }}
-    >
-      <Input />
-    </Form.Item>
-    <Form.Item>
-      <Button type="primary" htmlType="submit">
-        使用優惠碼
-      </Button>
-    </Form.Item>
-  </Form>
-);
 export default DiscountInput;

@@ -1,9 +1,22 @@
 import styled from "styled-components";
-import React, { useState } from "react";
-import { Col, Row, List, Card, Divider, Space, Flex, Button, Select, ConfigProvider } from "antd";
+import React, { useEffect, useState } from "react";
+import {
+  Col,
+  Row,
+  List,
+  Card,
+  Divider,
+  Space,
+  Flex,
+  Button,
+  Input,
+  Select,
+  ConfigProvider,
+} from "antd";
 
 import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { useTicketCart } from "../context/TicketCartContext";
 import DiscountInput from "./Discount_code";
 
 const ListItem = styled(List.Item)`
@@ -13,149 +26,133 @@ const ListItem = styled(List.Item)`
 
 const CardStyle = styled(Card)`
   background: orange;
-  width: 450px;
+  width: 500px;
 `;
 
 const selectOptions = Array.from({ length: 11 }, (_, i) => ({ value: i, label: i }));
 
-const ShoppingListComponent = () => (
-  <Flex align="center" gap="middle" justify="space-around">
-    <Col span={1}>
-      <a href="#" style={{ textDecoration: "none" }}>
-        X
-      </a>
-    </Col>
-    <Col span={2}>
-      <img src="/images/logo.jpg" alt="" width={"30px"} />
-    </Col>
-    <Col span={7} offset={1}>
-      <Col>2023演出DVD</Col>
-      <Col style={{ color: "gray", fontSize: "small" }}>NT$150</Col>
-    </Col>
-    <Col span={5}>
-      <ConfigProvider
-        theme={{
-          components: {
-            Select: { optionPadding: 5 },
-          },
-        }}
-      >
-        <Select size="small" defaultValue={0} options={selectOptions}></Select>
-      </ConfigProvider>
-    </Col>
-    <Col span={6}>小計：300</Col>
-  </Flex>
-);
-const ShoppingList = ({ cartItems, removeFromCart, getTotalAmount }) => (
-  <Flex vertical gap="middle" justify="center">
-    <h5>費用說明</h5>
-    <div>
-      <h6>商品及票券總金額超過500元，免運費100元</h6>
-    </div>
-    <CardStyle title="周邊商品">
-      <List
-        dataSource={cartItems}
-        renderItem={(item) => (
-          <ListItem>
-            <span>
-              <Button
-                onClick={() => removeFromCart(item.id, item.details.size, item.index)}
-                size="small"
-              >
-                X
-              </Button>
-            </span>
-            <span style={{ margin: "0 10px" }}>{item.name}</span>
-            <span style={{ margin: "0 10px" }}>{item.details.qty} 件</span>
-            <span style={{ marginLeft: "20px" }}>
-              <Col>尺寸：{item.details.size || "單一尺寸"}</Col>
-              <Col>單價：NT$ {item.on_discount ? item.discount_price : item.price}</Col>
-            </span>
-          </ListItem>
-        )}
-      />
-      <Divider />
-      <Row justify={"start"}>
-        <DiscountInput />
-      </Row>
-      <Row justify={"end"}>
-        <h6>總金額：NT$ {getTotalAmount()} </h6>
-      </Row>
-    </CardStyle>
-  </Flex>
-);
+const ShoppingList = () => {
+  const { cartItems, removeFromCart, getTotalAmount } = useCart();
 
-const TicketListComponent = () => (
-  <>
-    <Flex align="center" gap="middle" justify="space-around">
-      <Col span={1}>
-        <a href="#" style={{ textDecoration: "none" }}>
-          X
-        </a>
-      </Col>
-      <Col span={2}>
-        <img src="/images/logo.jpg" alt="" width={"30px"} />
-      </Col>
-      <Col span={10}>
-        <Col>2024巡迴公演-台北場</Col>
-      </Col>
-      <Col span={10}>
-        <Col style={{ color: "gray", fontSize: "small" }}>時間；2024.7.30（一）</Col>
-        <Col style={{ color: "gray", fontSize: "small" }}>地點：蘆洲功學社音樂廳</Col>
-      </Col>
+  return (
+    <Flex vertical gap="middle" justify="center">
+      <h5>費用說明</h5>
+      <div>
+        <h6>商品及票券總金額超過500元，免運費100元</h6>
+      </div>
+      <CardStyle title="周邊商品">
+        <List
+          dataSource={cartItems}
+          renderItem={(item) => (
+            <ListItem>
+              <span>
+                <Button
+                  onClick={() => removeFromCart(item.id, item.details.size, item.index)}
+                  size="small"
+                >
+                  X
+                </Button>
+              </span>
+              <span style={{ margin: "0 10px" }}>{item.name}</span>
+              <span style={{ margin: "0 10px" }}>{item.details.qty} 件</span>
+              <span style={{ marginLeft: "20px" }}>
+                <Col>尺寸：{item.details.size || "單一尺寸"}</Col>
+                <Col>單價：NT$ {item.on_discount ? item.discount_price : item.price}</Col>
+              </span>
+            </ListItem>
+          )}
+        />
+        <Divider />
+        <Row justify={"start"}>
+          <DiscountInput />
+          {/* TODO 待修改與ticket聯動 */}
+        </Row>
+        <Row justify={"end"}>
+          <h6>總金額：NT$ {getTotalAmount()} </h6>
+        </Row>
+      </CardStyle>
     </Flex>
-    <br />
+  );
+};
+
+const TicketList = () => {
+  const {
+    choiceSeats,
+    removeTicketFromCart,
+    getTicketDiscountTotal,
+    discountCode,
+    getInput,
+    applyDiscountCode,
+    appliedDiscounts,
+  } = useTicketCart();
+  return (
     <Flex vertical>
-      <Col span={24}>票券資訊</Col>
+      <CardStyle title="活動票券">
+        <List
+          dataSource={choiceSeats}
+          renderItem={(item) => (
+            <ListItem>
+              <span>
+                <Button onClick={() => removeTicketFromCart(item)} size="small">
+                  X
+                </Button>
+              </span>
+              <span>
+                <Col>{discountCode.name}</Col>
+                <Col style={{ color: "gray", fontSize: "small" }}>地點：蘆洲功學社音樂廳</Col>
+              </span>
+              <span style={{ margin: "0 5px" }}>
+                {item.row_num ? (
+                  <div>
+                    座位： {item.seat_num[0]}排 {item.seat_num[1]}號
+                  </div>
+                ) : (
+                  <div>
+                    座位：
+                    {item.area}區 {item.seat_num[0]}排 {item.seat_num.slice(1)}號
+                  </div>
+                )}
+              </span>
+              <span style={{ marginLeft: "5px" }}>
+                <Col></Col>
+                <Col>{item.price}元</Col>
+              </span>
+            </ListItem>
+          )}
+        />
+        <Divider />
+        <Row justify={"start"}>
+          <Space>
+            <Input
+              placeholder="輸入優惠碼"
+              value={discountCode}
+              onChange={(e) => getInput(e.target.value)}
+            />
+            <Button onClick={applyDiscountCode}>使用優惠</Button>
+          </Space>
+          <br />
+        </Row>
+        <Divider />
 
-      <Row align="middle" gutter={5} justify="end">
-        <Col>票券1：</Col>
-        <Col style={{ width: "10px", height: "10px", background: "gray" }}></Col>
-        <Col> 100元</Col>
-        <Col push={1}> 座號：</Col>
-        <Col push={1}> 第 L 排 12 號</Col>
-      </Row>
-      <Row align="middle" gutter={5} justify="end">
-        <Col>票券1：</Col>
-        <Col style={{ width: "10px", height: "10px", background: "gray" }}></Col>
-        <Col> 100元</Col>
-        <Col push={1}> 座號：</Col>
-        <Col push={1}> 第 L 排 12 號</Col>
-      </Row>
+        <Row justify={"start"}>
+          <Col>
+            已使用優惠碼：{appliedDiscounts.name} （{appliedDiscounts.description}）
+          </Col>
+        </Row>
+
+        <Row justify={"end"}>
+          <h6>總金額：NT$ {getTicketDiscountTotal()} </h6>
+        </Row>
+      </CardStyle>
     </Flex>
-  </>
-);
-
-const TicketList = () => (
-  <Flex vertical>
-    <Card
-      title="活動票券"
-      style={{
-        width: 450,
-        background: "white",
-      }}
-    >
-      <Row>
-        <TicketListComponent />
-      </Row>
-      <Divider />
-      <Row justify={"end"}>
-        <Col>總金額： NT$ 300</Col>
-      </Row>
-    </Card>
-  </Flex>
-);
+  );
+};
 
 export const SecondStep = () => {
-  const { cartItems, removeFromCart, getTotalAmount } = useCart();
   return (
     <Row style={{ marginTop: "10px" }}>
       <Col span={16} offset={2}>
-        <ShoppingList
-          cartItems={cartItems}
-          removeFromCart={removeFromCart}
-          getTotalAmount={getTotalAmount}
-        />
+        <ShoppingList />
         <br />
         <TicketList />
       </Col>

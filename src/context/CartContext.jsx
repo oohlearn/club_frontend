@@ -1,5 +1,8 @@
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
 import { message } from "antd";
+import axios from "axios";
+
+const apiUrl = process.env.REACT_APP_API_URL;
 
 const CartContext = createContext();
 
@@ -7,6 +10,11 @@ const CartContext = createContext();
 // TODO 同品項會重複出現
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
+  const [productCodeData, setProductCodeData] = useState([]);
+  const [discountCode, setDiscountCode] = useState("");
+  const [productDiscountTotal, setProductDiscountTotal] = useState(0);
+  const [isDiscountApplied, setIsDiscountApplied] = useState(false);
+  const [appliedDiscounts, setAppliedDiscounts] = useState({});
 
   const addToCart = (product, quantity, size) => {
     setCartItems((prevItems) => {
@@ -59,9 +67,69 @@ export function CartProvider({ children }) {
     setCartItems([]);
   };
 
+  // 優惠碼
+  const getInput = (input) => {
+    setDiscountCode(input);
+    setIsDiscountApplied(false); // 重置折扣應用狀態
+  };
+
+  const getProductCodeData = async () => {
+    if (cartItems.length === 0) return;
+    try {
+      const response = await axios.get(`${apiUrl}shopping/productCode/`);
+      setProductCodeData(response.data.productCode);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getProductCodeData();
+    console.log(productCodeData);
+  }, [cartItems]);
+
+  const applyDiscountCode = () => {
+    const totalAmount = getTotalAmount();
+    const foundCode = productCodeData.find(
+      (discount) =>
+        discount.code === discountCode &&
+        discount.is_valid &&
+        new Date(discount.end_date) > new Date()
+    );
+    if (foundCode) {
+      const discount = foundCode.discount;
+      message.success(`已應用${foundCode.name}: ${foundCode.description}`);
+      setProductDiscountTotal(totalAmount * discount);
+      setIsDiscountApplied(true);
+      setAppliedDiscounts(foundCode);
+      setDiscountCode(""); // 清空輸入框
+    } else {
+      message.error("無效的優惠碼");
+      setProductDiscountTotal(totalAmount);
+      setIsDiscountApplied(false);
+    }
+  };
+
+  const getProductDiscountTotal = () => {
+    return isDiscountApplied ? productDiscountTotal : getTotalAmount();
+  };
+
   return (
     <CartContext.Provider
-      value={{ cartItems, addToCart, removeFromCart, clearCart, getTotalAmount }}
+      value={{
+        cartItems,
+        addToCart,
+        removeFromCart,
+        clearCart,
+        getTotalAmount,
+        discountCode,
+        productDiscountTotal,
+        getProductDiscountTotal,
+        getInput,
+        applyDiscountCode,
+        isDiscountApplied,
+        appliedDiscounts,
+      }}
     >
       {children}
     </CartContext.Provider>

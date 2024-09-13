@@ -71,7 +71,9 @@ const CartDrawer = ({ cartItems, removeFromCart }) => {
                 <Link to="/activities">
                   <Button style={{ marginRight: "20px" }}>購票</Button>
                 </Link>
-                <Button type="primary">結帳</Button>
+                <Link to="shop/checkout">
+                  <Button type="primary">結帳</Button>
+                </Link>
               </>
             }
           >
@@ -99,7 +101,7 @@ const CartDrawer = ({ cartItems, removeFromCart }) => {
             />
             <Divider />
             <h5>總金額：NT$ {getTotalAmount()} </h5>
-            <p>商品及票券總金額超過500元，免運費100元</p>
+            <p>商品加票券總金額超過500元，免運費100元</p>
           </Drawer>
         </div>
       </>

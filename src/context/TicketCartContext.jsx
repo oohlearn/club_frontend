@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { message } from "antd";
 import axios from "axios";
+
 const apiUrl = process.env.REACT_APP_API_URL;
 
 const TicketCartContext = createContext();
@@ -13,25 +14,6 @@ export function TicketCartProvider({ children }) {
   const [discountTotal, setDiscountTotal] = useState(0);
   const [isDiscountApplied, setIsDiscountApplied] = useState(false);
   const [appliedDiscounts, setAppliedDiscounts] = useState({});
-
-  const getInput = (input) => {
-    setDiscountCode(input);
-    setIsDiscountApplied(false); // 重置折扣應用狀態
-  };
-
-  const getTicketCodeData = async () => {
-    if (choiceSeats.length === 0) return;
-    try {
-      const response = await axios.get(`${apiUrl}activity/events/${choiceSeats[0].event_id}/`);
-      setCodeData(response.data.ticket_discount_code);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    getTicketCodeData();
-  }, [choiceSeats]);
 
   const getPrice = (price) => {
     setChoicePrice(parseInt(price));
@@ -65,6 +47,26 @@ export function TicketCartProvider({ children }) {
   const clearTicketCart = () => {
     setChoiceSeats([]);
   };
+
+  // 優惠碼
+  const getInput = (input) => {
+    setDiscountCode(input);
+    setIsDiscountApplied(false); // 重置折扣應用狀態
+  };
+
+  const getTicketCodeData = async () => {
+    if (choiceSeats.length === 0) return;
+    try {
+      const response = await axios.get(`${apiUrl}activity/events/${choiceSeats[0].event_id}/`);
+      setCodeData(response.data.ticket_discount_code);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getTicketCodeData();
+  }, [choiceSeats]);
 
   const applyDiscountCode = () => {
     const totalAmount = getTicketTotalAmount();

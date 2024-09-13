@@ -32,7 +32,16 @@ const CardStyle = styled(Card)`
 const selectOptions = Array.from({ length: 11 }, (_, i) => ({ value: i, label: i }));
 
 const ShoppingList = () => {
-  const { cartItems, removeFromCart, getTotalAmount } = useCart();
+  const {
+    cartItems,
+    removeFromCart,
+    getTotalAmount,
+    discountCode,
+    getInput,
+    applyDiscountCode,
+    appliedDiscounts,
+    getProductDiscountTotal,
+  } = useCart();
 
   return (
     <Flex vertical gap="middle" justify="center">
@@ -63,12 +72,29 @@ const ShoppingList = () => {
           )}
         />
         <Divider />
-        <Row justify={"start"}>
-          <DiscountInput />
-          {/* TODO 待修改與ticket聯動 */}
+        <Row justify={"start"} gutter={5}>
+          <Space>
+            <Input
+              placeholder="輸入優惠碼"
+              value={discountCode}
+              onChange={(e) => getInput(e.target.value)}
+            />
+            <Button onClick={applyDiscountCode}>使用優惠</Button>
+          </Space>
+          <br />
         </Row>
+        <Divider />
+        {appliedDiscounts.code ? (
+          <Col>
+            已使用優惠碼：{appliedDiscounts.name} {appliedDiscounts.code} （
+            {appliedDiscounts.description}）
+          </Col>
+        ) : (
+          ""
+        )}
+
         <Row justify={"end"}>
-          <h6>總金額：NT$ {getTotalAmount()} </h6>
+          <h6>總金額：NT$ {getProductDiscountTotal()} </h6>
         </Row>
       </CardStyle>
     </Flex>
@@ -121,7 +147,7 @@ const TicketList = () => {
           )}
         />
         <Divider />
-        <Row justify={"start"}>
+        <Row justify={"start"} gutter={2}>
           <Space>
             <Input
               placeholder="輸入優惠碼"
@@ -135,11 +161,15 @@ const TicketList = () => {
         <Divider />
 
         <Row justify={"start"}>
-          <Col>
-            已使用優惠碼：{appliedDiscounts.name} （{appliedDiscounts.description}）
-          </Col>
+          {appliedDiscounts.code ? (
+            <Col>
+              已使用優惠碼：{appliedDiscounts.name}
+              {appliedDiscounts.code} （{appliedDiscounts.description}）
+            </Col>
+          ) : (
+            ""
+          )}
         </Row>
-
         <Row justify={"end"}>
           <h6>總金額：NT$ {getTicketDiscountTotal()} </h6>
         </Row>
@@ -149,6 +179,9 @@ const TicketList = () => {
 };
 
 export const SecondStep = () => {
+  const { getProductDiscountTotal } = useCart();
+  const { getTicketDiscountTotal } = useTicketCart();
+  let orderTotalAmount = getProductDiscountTotal() + getTicketDiscountTotal();
   return (
     <Row style={{ marginTop: "10px" }}>
       <Col span={16} offset={2}>
@@ -162,12 +195,12 @@ export const SecondStep = () => {
             <h5>
               <strong>總金額</strong>
             </h5>
-            <h5>
-              <strong>NT$ 200</strong>
-            </h5>
+            {orderTotalAmount < 500 && orderTotalAmount !== 0
+              ? (orderTotalAmount += 100)
+              : orderTotalAmount}
           </Col>
           <a href="ThirdStep">
-            <Button type="default">填寫付款資訊及繳費</Button>
+            <Button type="primary">填寫付款資訊及繳費</Button>
           </a>
         </Flex>
       </Col>

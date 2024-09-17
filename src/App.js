@@ -18,12 +18,15 @@ import Shop from "./pages/Shop/ShopPage";
 import ChooseSeats from "./pages/Order/ChooseSeats";
 import Checkout from "./pages/Order/Checkout";
 import ProductDetail from "./pages/Shop/ProductDetail";
-import Login from "./pages/Members/Login";
-import Register from "./pages/Members/Register";
+import AdminLogin from "./pages/Admin/AdminLogin";
+import AdminRegister from "./pages/Admin/AdminRegister";
+import UserLogin from "./pages/Users/UserLogin";
+import UserRegister from "./pages/Users/UserRegister";
 import { CartProvider } from "./context/CartContext";
 import TicketCartDrawer from "./pages/Activities/TicketCartDrawer";
 import { TicketCartProvider } from "./context/TicketCartContext";
 import { ProductsProvider } from "./context/ProductContext";
+
 function App() {
   return (
     <div className="App">
@@ -33,16 +36,16 @@ function App() {
             <Routes>
               <Route path="/" element={<FrontLayout />}>
                 <Route path="" element={<Home />}></Route>
-                <Route path="login" element={<Login />}></Route>
-                <Route path="register" element={<Register />}></Route>
-
+                <Route path="login" element={<UserLogin />}></Route>
+                <Route path="register" element={<UserRegister />}></Route>
                 <Route path="intro" element={<IntroPage />}>
                   <Route path="" element={<IntroHome />}></Route>
                   <Route path="experiences" element={<ExperiencesPage />}></Route>
                   <Route path="conductors" element={<Conductors />}></Route>
                   <Route path="teachers" element={<Teachers />}></Route>
                 </Route>
-
+                <Route path="admin-login" element={<AdminLogin />}></Route>
+                <Route path="admin-register" element={<AdminRegister />}></Route>
                 <Route path="videos" element={<Videos />}></Route>
                 <Route path="albums" element={<Albums />}></Route>
                 <Route path="albums/:albumId" element={<AlbumDetail />}></Route>

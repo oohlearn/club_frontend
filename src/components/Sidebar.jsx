@@ -5,6 +5,7 @@ import {
   YoutubeOutlined,
   CalendarOutlined,
   CameraOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import { Menu, Layout, theme } from "antd";
 import { Link } from "react-router-dom";
@@ -34,7 +35,7 @@ const items = [
     icon: <CalendarOutlined />,
     label: (
       <Link to="/activities" style={{ textDecoration: "none" }}>
-        近期活動
+        近期演出
       </Link>
     ),
   },
@@ -53,6 +54,15 @@ const items = [
     label: (
       <Link to="/videos" style={{ textDecoration: "none" }}>
         精華影片
+      </Link>
+    ),
+  },
+  {
+    key: "6",
+    icon: <UserOutlined />,
+    label: (
+      <Link to="/login" style={{ textDecoration: "none" }}>
+        登入/註冊
       </Link>
     ),
   },

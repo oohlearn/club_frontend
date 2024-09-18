@@ -11,7 +11,7 @@ const UserLogin = () => {
     <>
       <TitleComponent label="購物登入/註冊" />
       尚未有帳號？
-      <Link to="/register">
+      <Link to="/user/register">
         <Button block type="primary" htmlType="submit">
           註冊
         </Button>

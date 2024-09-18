@@ -11,9 +11,13 @@ import {
   InputNumber,
   Row,
   Select,
+  message,
 } from "antd";
+import axios from "axios";
 import TitleComponent from "../../components/TitleComponent";
 const { Option } = Select;
+
+const apiUrl = process.env.REACT_APP_API_URL;
 
 const formItemLayout = {
   labelCol: {
@@ -45,9 +49,45 @@ const tailFormItemLayout = {
     },
   },
 };
+
 const UserRegister = () => {
   const [form] = Form.useForm();
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
+    try {
+      const userData = {
+        username: values.email, // 使用 email 作為 username
+        password: values.password,
+        email: values.email,
+        nickname: values.nickname,
+      };
+      const response = await axios.post(`${apiUrl}user/register`, userData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+      if (response.status === 201) {
+        message.success("表單提交成功！");
+        form.resetFields();
+      } else {
+        message.error("提交失敗，請稍後再試。");
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      message.error("提交時發生錯誤，請稍後再試。");
+      if (error.response) {
+        console.error("錯誤響應數據:", error.response.data);
+        console.error("錯誤響應狀態:", error.response.status);
+        console.error("錯誤響應頭:", error.response.headers);
+        message.error(`提交失敗：${error.response.data.error || "未知錯誤"}`);
+      } else if (error.request) {
+        console.error("沒有收到響應，請求詳情:", error.request);
+        message.error("無法連接到服務器，請檢查網絡連接");
+      } else {
+        console.error("錯誤詳情:", error.message);
+        message.error("發生錯誤，請稍後再試");
+      }
+    }
     console.log("Received values of form: ", values);
   };
   const prefixSelector = (
@@ -90,7 +130,7 @@ const UserRegister = () => {
     <>
       <TitleComponent label="購物登入/註冊" />
       已有帳號？
-      <Link to="/login">
+      <Link to="/user/login">
         <Button block type="primary" htmlType="submit">
           登入
         </Button>

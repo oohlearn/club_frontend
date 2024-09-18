@@ -31,41 +31,39 @@ function App() {
   return (
     <div className="App">
       <CartProvider>
-        <ProductsProvider>
-          <TicketCartProvider>
-            <Routes>
-              <Route path="/" element={<FrontLayout />}>
-                <Route path="" element={<Home />}></Route>
-                <Route path="login" element={<UserLogin />}></Route>
-                <Route path="register" element={<UserRegister />}></Route>
-                <Route path="intro" element={<IntroPage />}>
-                  <Route path="" element={<IntroHome />}></Route>
-                  <Route path="experiences" element={<ExperiencesPage />}></Route>
-                  <Route path="conductors" element={<Conductors />}></Route>
-                  <Route path="teachers" element={<Teachers />}></Route>
-                </Route>
-                <Route path="admin-login" element={<AdminLogin />}></Route>
-                <Route path="admin-register" element={<AdminRegister />}></Route>
-                <Route path="videos" element={<Videos />}></Route>
-                <Route path="albums" element={<Albums />}></Route>
-                <Route path="albums/:albumId" element={<AlbumDetail />}></Route>
-                <Route path="news" element={<News />}></Route>
-                <Route path="news/:newsId" element={<NewsDetail />}></Route>
-                <Route path="contact" element={<Contact />}></Route>
-
-                <Route path="activities" element={<Activities />}></Route>
-                <Route path="activities/:eventId" element={<ActivityDetail />}></Route>
-                <Route
-                  path="activities/:eventId/choose_seats/:price"
-                  element={<ChooseSeats />}
-                ></Route>
-                <Route path="shop" element={<Shop />}></Route>
-                <Route path="shop/:productId" element={<ProductDetail />}></Route>
-                <Route path="shop/checkout" element={<Checkout />}></Route>
+        <TicketCartProvider>
+          <Routes>
+            <Route path="/" element={<FrontLayout />}>
+              <Route path="" element={<Home />}></Route>
+              <Route path="user/login" element={<UserLogin />}></Route>
+              <Route path="user/register" element={<UserRegister />}></Route>
+              <Route path="intro" element={<IntroPage />}>
+                <Route path="" element={<IntroHome />}></Route>
+                <Route path="experiences" element={<ExperiencesPage />}></Route>
+                <Route path="conductors" element={<Conductors />}></Route>
+                <Route path="teachers" element={<Teachers />}></Route>
               </Route>
-            </Routes>
-          </TicketCartProvider>
-        </ProductsProvider>
+              <Route path="admin-login" element={<AdminLogin />}></Route>
+              <Route path="admin-register" element={<AdminRegister />}></Route>
+              <Route path="videos" element={<Videos />}></Route>
+              <Route path="albums" element={<Albums />}></Route>
+              <Route path="albums/:albumId" element={<AlbumDetail />}></Route>
+              <Route path="news" element={<News />}></Route>
+              <Route path="news/:newsId" element={<NewsDetail />}></Route>
+              <Route path="contact" element={<Contact />}></Route>
+
+              <Route path="activities" element={<Activities />}></Route>
+              <Route path="activities/:eventId" element={<ActivityDetail />}></Route>
+              <Route
+                path="activities/:eventId/choose_seats/:price"
+                element={<ChooseSeats />}
+              ></Route>
+              <Route path="shop" element={<Shop />}></Route>
+              <Route path="shop/:productId" element={<ProductDetail />}></Route>
+              <Route path="shop/checkout" element={<Checkout />}></Route>
+            </Route>
+          </Routes>
+        </TicketCartProvider>
       </CartProvider>
     </div>
   );

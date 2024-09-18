@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import { Button, Modal, message, Image, Row, ConfigProvider, Select, Col } from "antd";
 import styled from "styled-components";
 import { useCart } from "../../context/CartContext";
-import { useProduct } from "../../context/ProductContext";
 
 const ModalStyle = styled.div`
   h6 {

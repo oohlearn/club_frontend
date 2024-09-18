@@ -61,7 +61,7 @@ const items = [
     key: "6",
     icon: <UserOutlined />,
     label: (
-      <Link to="/login" style={{ textDecoration: "none" }}>
+      <Link to="/user/login" style={{ textDecoration: "none" }}>
         登入/註冊
       </Link>
     ),

@@ -85,7 +85,7 @@ export function CartProvider({ children }) {
 
   useEffect(() => {
     getProductCodeData();
-    console.log(productCodeData);
+    console.log({ productCodeData });
   }, [cartItems]);
 
   const applyDiscountCode = () => {

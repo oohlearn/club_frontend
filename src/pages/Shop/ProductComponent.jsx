@@ -14,9 +14,7 @@ import {
   Image,
 } from "antd";
 import styled from "styled-components";
-import DOMPurify from "dompurify"; //清理HTML
 import AddToCartModal from "./AddToCartModal.jsx";
-import { PopMessage } from "../../components/PopMessage.jsx";
 const ListStyle = styled.div`
   .link {
     text-decoration: none;

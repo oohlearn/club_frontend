@@ -14,10 +14,8 @@ import {
   ConfigProvider,
 } from "antd";
 
-import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useTicketCart } from "../context/TicketCartContext";
-import DiscountInput from "./Discount_code";
 
 const ListItem = styled(List.Item)`
   display: flex;
@@ -47,7 +45,7 @@ const ShoppingList = () => {
     <Flex vertical gap="middle" justify="center">
       <h5>費用說明</h5>
       <div>
-        <h6>商品及票券總金額超過500元，免運費100元</h6>
+        <h6>若有訂購任一演出活動票券，免運費100元</h6>
       </div>
       <CardStyle title="周邊商品">
         <List
@@ -195,7 +193,7 @@ export const SecondStep = () => {
             <h5>
               <strong>總金額</strong>
             </h5>
-            {orderTotalAmount < 500 && orderTotalAmount !== 0
+            {getTicketDiscountTotal() <= 0 && orderTotalAmount !== 0
               ? (orderTotalAmount += 100)
               : orderTotalAmount}
           </Col>

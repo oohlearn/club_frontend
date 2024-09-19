@@ -113,7 +113,30 @@ export function CartProvider({ children }) {
   const getProductDiscountTotal = () => {
     return isDiscountApplied ? productDiscountTotal : getTotalAmount();
   };
+  const submitOrder = async (cartItems, ticketItems, customer, discountCodes) => {
+    try {
+      const orderData = {
+        customer: customer,
+        cartItems: cartItems.map((item) => ({
+          product: item.id,
+          size: item.details.size,
+          quantity: item.details.qty,
+        })),
+        ticketItems: ticketItems.map((item) => ({
+          seat: item.row_num ? item.id : null,
+          seat_v2: !item.row_num ? item.id : null,
+        })),
+        ticket_discount_code: discountCodes.ticketCode,
+        product_code: discountCodes.productCode,
+      };
 
+      const response = await axios.post("http://your-backend-api-url/api/orders/", orderData);
+      return response.data;
+    } catch (error) {
+      console.error("Error submitting order:", error);
+      throw error;
+    }
+  };
   return (
     <CartContext.Provider
       value={{

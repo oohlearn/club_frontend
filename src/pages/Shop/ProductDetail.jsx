@@ -93,7 +93,7 @@ const CartDrawer = ({ cartItems, removeFromCart, getTotalAmount, productId }) =>
                 <Link to="/activities">
                   <Button style={{ marginRight: "20px" }}>購票</Button>
                 </Link>
-                <Link to="/shop/checkout">
+                <Link to="checkout">
                   <Button type="primary">結帳</Button>
                 </Link>
               </>

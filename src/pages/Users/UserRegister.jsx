@@ -58,7 +58,7 @@ const UserRegister = () => {
         username: values.email, // 使用 email 作為 username
         password: values.password,
         email: values.email,
-        nickname: values.nickname,
+        name: values.name,
       };
       const response = await axios.post(`${apiUrl}user/register`, userData, {
         headers: {
@@ -203,7 +203,7 @@ const UserRegister = () => {
         </Form.Item>
 
         <Form.Item
-          name="nickname"
+          name="name"
           label="稱呼"
           rules={[
             {

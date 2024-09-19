@@ -9,6 +9,7 @@ import {
 } from "@ant-design/icons";
 import { Menu, Layout, theme } from "antd";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 const { Header, Content, Sider } = Layout;
 
 const items = [
@@ -69,6 +70,7 @@ const items = [
 ];
 
 function Sidebar() {
+  const { isAuthenticated, user } = useAuth();
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();

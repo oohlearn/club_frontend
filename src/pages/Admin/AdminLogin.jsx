@@ -1,14 +1,26 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { Button, Checkbox, Form, Input, Flex, Row } from "antd";
+import { Button, Form, Input, Row } from "antd";
 import TitleComponent from "../../components/TitleComponent";
+import { useAuth } from "../../context/AuthContext";
+
 const AdminLogin = () => {
-  const onFinish = (values) => {
-    console.log("Received values of form: ", values);
+  const { adminLoginAuth } = useAuth();
+  const navigate = useNavigate();
+
+  const onFinish = async (values) => {
+    try {
+      await adminLoginAuth(values.username, values.password);
+      navigate("/admin-link");
+      console.log("Received values of form: ", values);
+    } catch (error) {
+      console.log("登入失敗", error);
+    }
   };
   return (
     <>
-      <TitleComponent label="幹部註冊" />
+      <TitleComponent label="幹部登入" />
 
       <Form
         name="login"

@@ -31,6 +31,8 @@ export const AuthProvider = ({ children }) => {
 
   const validateToken = async () => {
     const token = localStorage.getItem("token");
+    console.log("Stored token:", token); // 檢查 token 是否正確存儲
+
     if (!token) {
       setLoading(false);
       return;

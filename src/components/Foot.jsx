@@ -8,7 +8,7 @@ function Foot() {
   const items = [
     {
       label: (
-        <NavLink to="login" style={{ textDecoration: "none" }}>
+        <NavLink to="admin-login" style={{ textDecoration: "none" }}>
           幹部登入
         </NavLink>
       ),
@@ -17,7 +17,7 @@ function Foot() {
     },
     {
       label: (
-        <NavLink to="register" style={{ textDecoration: "none" }}>
+        <NavLink to="admin-register" style={{ textDecoration: "none" }}>
           幹部註冊
         </NavLink>
       ),

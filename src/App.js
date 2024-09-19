@@ -29,6 +29,7 @@ import { ProductsProvider } from "./context/ProductContext";
 import { AuthProvider } from "./context/AuthContext";
 import AdminLink from "./pages/Admin/AdminLink";
 import UserDashBoard from "./pages/Users/UserDashboard";
+import UserLogout from "./pages/Users/UserLogout";
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
                 <Route path="user/login" element={<UserLogin />}></Route>
                 <Route path="user/register" element={<UserRegister />}></Route>
                 <Route path="user/dashboard" element={<UserDashBoard />}></Route>
+                <Route path="user/logout" element={<UserLogout />}></Route>
 
                 <Route path="intro" element={<IntroPage />}>
                   <Route path="" element={<IntroHome />}></Route>

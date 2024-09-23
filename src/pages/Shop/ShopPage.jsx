@@ -6,7 +6,7 @@ import { Input, Space, Button, Col, Row, Select, message } from "antd";
 import CartDrawer from "./CartDrawer";
 import axios from "axios";
 import ProductComponent from "./ProductComponent";
-import { useCart } from "../../context/CartContext";
+import { useProductCart } from "../../context/ProductCartContext";
 
 const StylePagination = styled.div`
   display: flex;
@@ -86,7 +86,7 @@ const CategorySearchBar = () => {
 function Shop() {
   const [productsData, setProductsData] = useState([]);
   const apiUrl = process.env.REACT_APP_API_URL;
-  const { cartItems, removeFromCart } = useCart();
+  const { cartItems, removeFromCart } = useProductCart();
 
   const getProductsData = async () => {
     try {

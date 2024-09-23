@@ -3,8 +3,7 @@ import { Link } from "react-router-dom";
 
 import { Button, Modal, message, Image, Row, ConfigProvider, Select, Col } from "antd";
 import styled from "styled-components";
-import { useCart } from "../../context/CartContext";
-
+import { useProductCart } from "../../context/ProductCartContext";
 const ModalStyle = styled.div`
   h6 {
     margin-top: 50px;
@@ -21,7 +20,7 @@ const AddToCartModal = ({ loading, setOpen, open, product }) => {
   const [sizeOptions, setSizeOptions] = useState([]);
   const [selectedQty, setSelectedQty] = useState(1);
   const [selectedSize, setSelectedSize] = useState("");
-  const { addToCart } = useCart();
+  const { addToCart } = useProductCart();
 
   useEffect(() => {
     if (product?.size_list) {

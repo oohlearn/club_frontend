@@ -17,7 +17,7 @@ import {
   message,
 } from "antd";
 import styled from "styled-components";
-import { useCart } from "../../context/CartContext";
+import { useProductCart } from "../../context/ProductCartContext";
 
 const DetailStyle = styled.div`
   .photo_image {
@@ -140,14 +140,15 @@ const CartDrawer = ({ cartItems, removeFromCart, getTotalAmount, productId }) =>
 const selectOptions = Array.from({ length: 11 }, (_, i) => ({ value: i, label: i }));
 
 function ProductDetail() {
-  const [productData, setProductData] = useState([]);
+  const [productData, setProductData] = useState({ size_list: [] });
+
   const [sizeOptions, setSizeOptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedQty, setSelectedQty] = useState(1);
   const [selectedSize, setSelectedSize] = useState("");
   const apiUrl = process.env.REACT_APP_API_URL;
   const { productId } = useParams();
-  const { addToCart, cartItems, removeFromCart, getTotalAmount } = useCart();
+  const { addToCart, cartItems, removeFromCart, getTotalAmount } = useProductCart();
 
   const getProductDetail = async () => {
     try {
@@ -175,7 +176,7 @@ function ProductDetail() {
     getProductDetail();
     console.log(productData);
   }, [productId]);
-  if (loading) {
+  if (loading || !productData) {
     return <div>Loading...</div>;
   }
   // 加入購物車
@@ -200,7 +201,7 @@ function ProductDetail() {
           <Col>
             <h3
               style={{
-                display: productData.state_tag === "新上市" ? "block" : "none",
+                display: productData?.state_tag === "新上市" ? "block" : "none",
                 color: "orange",
                 fontWeight: "bold",
               }}
@@ -239,29 +240,31 @@ function ProductDetail() {
               </ConfigProvider>
             </Row>
             <br />
-            <Row
-              style={{
-                display: productData.size_list.length > 0 ? "block" : "none",
-                color: "orange",
-                fontWeight: "bold",
-              }}
-            >
-              尺寸：（不同尺寸或顏色，請分別加入購物車）
-              <ConfigProvider
-                theme={{
-                  components: {
-                    Select: { optionPadding: "15" },
-                  },
+            {productData && productData.size_list && productData.size_list.length > 0 && (
+              <Row
+                style={{
+                  display: productData?.size_list?.length > 0 ? "block" : "none",
+                  color: "orange",
+                  fontWeight: "bold",
                 }}
               >
-                <Select
-                  className="sizeOption"
-                  size="small"
-                  options={sizeOptions ? sizeOptions : "單一尺寸"}
-                  onChange={(value) => setSelectedSize(value)}
-                ></Select>
-              </ConfigProvider>
-            </Row>
+                尺寸：（不同尺寸或顏色，請分別加入購物車）
+                <ConfigProvider
+                  theme={{
+                    components: {
+                      Select: { optionPadding: "15" },
+                    },
+                  }}
+                >
+                  <Select
+                    className="sizeOption"
+                    size="small"
+                    options={sizeOptions ? sizeOptions : "單一尺寸"}
+                    onChange={(value) => setSelectedSize(value)}
+                  ></Select>
+                </ConfigProvider>
+              </Row>
+            )}
             <br />
             <Row justify={"space-around"}>
               <Link to="/shop">
@@ -289,22 +292,22 @@ function ProductDetail() {
         </h6>
         <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(productData.description) }}></p>
       </Row>
-
-      {productData.photos.map((photo) => (
-        <Row justify={"center"}>
-          <Col span={24}>
-            <h6 style={{ marginTop: "20px" }}>{photo.description}</h6>
-          </Col>
-          <Col span={24} className="photos">
-            <Image
-              className="photo_image"
-              style={{ textAlign: "center" }}
-              src={photo.image_data}
-              preview={false}
-            />
-          </Col>
-        </Row>
-      ))}
+      {Array.isArray(productData.photos) &&
+        productData.photos.map((photo) => (
+          <Row justify={"center"} key={photo.id}>
+            <Col span={24}>
+              <h6 style={{ marginTop: "20px" }}>{photo.description}</h6>
+            </Col>
+            <Col span={24} className="photos">
+              <Image
+                className="photo_image"
+                style={{ textAlign: "center" }}
+                src={photo.image_data}
+                preview={false}
+              />
+            </Col>
+          </Row>
+        ))}
     </DetailStyle>
   );
 }

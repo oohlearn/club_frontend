@@ -2,8 +2,7 @@ import React, { createContext, useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { message } from "antd";
-import { useCart } from "./CartContext";
-
+import { useProductCart } from "./ProductCartContext";
 const ProductsContext = createContext();
 
 export const ProductsProvider = ({ children }) => {
@@ -11,7 +10,7 @@ export const ProductsProvider = ({ children }) => {
   const [sizeOptions, setSizeOptions] = useState([]);
   const apiUrl = process.env.REACT_APP_API_URL;
   const [loading, setLoading] = useState(true);
-  const { addToCart, cartItems, removeFromCart, getTotalAmount } = useCart();
+  const { addToCart, cartItems, removeFromCart, getTotalAmount } = useProductCart();
   const [selectedQty, setSelectedQty] = useState(1);
   const [selectedSize, setSelectedSize] = useState("");
 

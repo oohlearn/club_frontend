@@ -15,8 +15,8 @@ import {
 } from "antd";
 import axios from "axios";
 import { FirstStep } from "./FirstStep";
-import { SecondStep } from "../../components/SecondStep";
-import { ThirdStep } from "../../components/ThirdStep";
+import { SecondStep } from "./SecondStep";
+import { ThirdStep } from "./ThirdStep";
 import SeatsChooseComponents from "../../components/Seats.jsx/MSChoiceSeats";
 import TicketCartDrawer from "../Activities/TicketCartDrawer";
 import { PopMessage } from "../../components/PopMessage";

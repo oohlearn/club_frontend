@@ -7,7 +7,11 @@ const apiUrl = process.env.REACT_APP_API_URL;
 const TicketCartContext = createContext();
 
 export function TicketCartProvider({ children }) {
-  const [choiceSeats, setChoiceSeats] = useState([]);
+  const [choiceSeats, setChoiceSeats] = useState(() => {
+    // 從 localStorage 讀取票券資料
+    const savedTickets = localStorage.getItem("ticketCart");
+    return savedTickets ? JSON.parse(savedTickets) : [];
+  });
   const [choicePrice, setChoicePrice] = useState();
   const [codeData, setCodeData] = useState([]);
   const [discountCode, setDiscountCode] = useState("");
@@ -63,6 +67,10 @@ export function TicketCartProvider({ children }) {
       console.log(error);
     }
   };
+  // 當票券選擇變化時，保存到 localStorage
+  useEffect(() => {
+    localStorage.setItem("ticketCart", JSON.stringify(choiceSeats));
+  }, [choiceSeats]);
 
   useEffect(() => {
     getTicketCodeData();

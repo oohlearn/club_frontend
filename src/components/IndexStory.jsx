@@ -24,7 +24,7 @@ const CarouselStyle = styled.div`
 
 const IndexStory = () => (
   <CarouselStyle>
-    <Carousel arrows autoplay>
+    <Carousel arrows autoplay speed={3000}>
       {indexStoryData.map((story) => {
         return (
           <div key={story.index}>

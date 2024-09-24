@@ -2,10 +2,11 @@ import styled from "styled-components";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button, Col, Row, Select, Steps, message, theme } from "antd";
-import { SecondStep } from "../../components/SecondStep";
-import { ThirdStep } from "../../components/ThirdStep";
-import { useCart } from "../../context/CartContext";
+import { SecondStep } from "./SecondStep";
+import { ThirdStep } from "./ThirdStep";
+import { useProductCart } from "../../context/ProductCartContext";
 import { useTicketCart } from "../../context/TicketCartContext";
+import { useCart } from "../../context/CartContext";
 
 const current = 0;
 
@@ -78,12 +79,12 @@ const StepsComponent = ({ cartItems, choiceSeats }) => {
 
         {current < steps.length - 1 && (
           <Button type="primary" onClick={() => next()}>
-            Next
+            填寫付款資訊及繳費
           </Button>
         )}
         {current === steps.length - 1 && (
           <Button type="primary" onClick={() => message.success("Processing complete!")}>
-            Done
+            確認訂單，並繳費NT$待補cart context同步
           </Button>
         )}
       </div>
@@ -93,8 +94,9 @@ const StepsComponent = ({ cartItems, choiceSeats }) => {
 
 function Checkout() {
   const navigate = useNavigate();
-  const { cartItems, removeFromCart, getTotalAmount } = useCart();
-  const { choiceSeats, removeTicketFromCart } = useTicketCart();
+  const { getProductDiscountTotal, removeFromCart } = useProductCart();
+  const { getTicketDiscountTotal, removeTicketFromCart } = useTicketCart();
+  const { productItems, ticketItems, getTotalAmount, getDiscountTotal, clearCart } = useCart();
 
   // 检查 Data 是否存在
   if (!orderData) {
@@ -109,8 +111,8 @@ function Checkout() {
         current={current}
         removeFromCart={removeFromCart}
         removeTicketFromCart={removeTicketFromCart}
-        choiceSeats={choiceSeats}
-        cartItems={cartItems}
+        ticketItems={ticketItems}
+        productItems={productItems}
         getTotalAmount={getTotalAmount}
       />
       <br />

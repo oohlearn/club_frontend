@@ -4,7 +4,7 @@ import axios from "axios";
 
 const apiUrl = process.env.REACT_APP_API_URL;
 
-const CartContext = createContext();
+const ProductCartContext = createContext();
 
 // TODO 要選尺寸才能加入購物車
 // TODO 同品項會重複出現
@@ -146,7 +146,7 @@ export function ProductCartProvider({ children }) {
     }
   };
   return (
-    <CartContext.Provider
+    <ProductCartContext.Provider
       value={{
         cartItems,
         addToCart,
@@ -163,10 +163,10 @@ export function ProductCartProvider({ children }) {
       }}
     >
       {children}
-    </CartContext.Provider>
+    </ProductCartContext.Provider>
   );
 }
 
 export function useProductCart() {
-  return useContext(CartContext);
+  return useContext(ProductCartContext);
 }

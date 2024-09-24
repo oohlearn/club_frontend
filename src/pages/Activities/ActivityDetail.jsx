@@ -325,17 +325,21 @@ function ActivityDetail() {
 
             <SeatsViewComponents display={eventData.ticket_system_url ? "none" : "block"} />
           </Row>
+          {eventData.is_sold ? (
+            <Row
+              justify={"center"}
+              style={{ display: eventData.ticket_system_url ? "none" : "block" }}
+            >
+              <TicketTable
+                dataSource={dataSource}
+                handleTicketChange={handleTicketChange}
+                resetTicketCounts={resetTicketCounts}
+              />
+            </Row>
+          ) : (
+            ""
+          )}
 
-          <Row
-            justify={"center"}
-            style={{ display: eventData.ticket_system_url ? "none" : "block" }}
-          >
-            <TicketTable
-              dataSource={dataSource}
-              handleTicketChange={handleTicketChange}
-              resetTicketCounts={resetTicketCounts}
-            />
-          </Row>
           <br />
         </DetailStyle>
       </EventContext.Provider>

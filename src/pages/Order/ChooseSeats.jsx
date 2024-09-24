@@ -14,13 +14,10 @@ import {
   ConfigProvider,
 } from "antd";
 import axios from "axios";
-import { FirstStep } from "./FirstStep";
-import { SecondStep } from "./SecondStep";
-import { ThirdStep } from "./ThirdStep";
 import SeatsChooseComponents from "../../components/Seats.jsx/MSChoiceSeats";
 import TicketCartDrawer from "../Activities/TicketCartDrawer";
-import { PopMessage } from "../../components/PopMessage";
 import { useTicketCart } from "../../context/TicketCartContext";
+import { useTimer } from "../../context/TimerContext";
 
 const SeatsViewStyle = styled.div`
   .seat {
@@ -31,86 +28,12 @@ const SeatsViewStyle = styled.div`
   }
 `;
 
-const current = 0;
-// TODO與商城合併
-const StepsComponent = ({ eventData, newOrder }) => {
-  const steps = [
-    {
-      title: "確認座位及張數",
-      content: <FirstStep eventData={eventData} newOrder={newOrder} />,
-    },
-    {
-      title: "確認訂單內容",
-      content: <SecondStep eventData={eventData} newOrder={newOrder} />,
-    },
-    {
-      title: "填寫訂購人資料及繳費",
-      content: <ThirdStep eventData={eventData} newOrder={newOrder} />,
-    },
-  ];
-  const { token } = theme.useToken();
-  const [current, setCurrent] = useState(0);
-  const next = () => {
-    setCurrent(current + 1);
-  };
-  const prev = () => {
-    setCurrent(current - 1);
-  };
-  const items = steps.map((item) => ({
-    key: item.title,
-    title: item.title,
-  }));
-  const contentStyle = {
-    color: token.colorTextTertiary,
-    backgroundColor: token.colorFillAlter,
-    borderRadius: token.borderRadiusLG,
-    border: `1px dashed ${token.colorBorder}`,
-    marginTop: 16,
-  };
-  return (
-    <>
-      <Steps current={current} items={items} activityData={eventData} newOrder={newOrder} />
-      <div style={contentStyle}>{steps[current].content}</div>
-      <div
-        style={{
-          marginTop: 45,
-          justifyContent: "center",
-          display: "flex",
-        }}
-      >
-        {current > 0 && (
-          <Button
-            style={{
-              margin: "0 8px",
-            }}
-            onClick={() => prev()}
-          >
-            Previous
-          </Button>
-        )}
-
-        {current < steps.length - 1 && (
-          <Button type="primary" onClick={() => next()}>
-            Next
-          </Button>
-        )}
-        {current === steps.length - 1 && (
-          <Button type="primary" onClick={() => message.success("Processing complete!")}>
-            Done
-          </Button>
-        )}
-      </div>
-    </>
-  );
-};
-
 function ChooseSeats() {
   const { eventId } = useParams();
   const [eventData, setEventData] = useState({});
   const [loading, setLoading] = useState(true);
-  // const [choiceSeats, setChoiceSeats] = useState([]);
-  // const [choicePrice, setChoicePrice] = useState();
   const { choiceSeats, getPrice, addToTicketCart, removeTicketFromCart } = useTicketCart();
+  const { startTimer, timeLeft, formatTime } = useTimer();
   const { price } = useParams();
   const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -129,38 +52,26 @@ function ChooseSeats() {
   useEffect(() => {
     getEventData();
     getPrice(price);
+    startTimer(1200);
   }, [eventId]);
   if (loading) {
     return <div>Loading...</div>;
   }
 
-  // const handleRemoveSeat = (seatToRemove) => {
-  //   setChoiceSeats(choiceSeats.filter((seat) => seat.seat_num !== seatToRemove.seat_num));
-  // };
-  // const handleClick = (seat) => {
-  //   // 获取之前选择的座位
-  //   // 检查座位是否已经存在于选择中
-  //   if (seat.price === choicePrice) {
-  //     const seatIndex = choiceSeats.findIndex(
-  //       (existingSeat) => existingSeat.seat_num === seat.seat_num
-  //     );
-  //     if (seatIndex === -1) {
-  //       // 如果座位不在选择中，则添加它
-  //       setChoiceSeats([...choiceSeats, seat]);
-  //     } else {
-  //       // 如果座位已在选择中，则从选择中移除它
-  //       const newChoiceSeats = [...choiceSeats];
-  //       newChoiceSeats.splice(seatIndex, 1);
-  //       setChoiceSeats(newChoiceSeats);
-  //     }
-  //   } else {
-  //     message.warning("請選擇相對應的票區");
-  //   }
-  //   console.log(choiceSeats);
-  // };
-
   return (
     <>
+      <div
+        style={{
+          position: "fixed",
+          top: 10,
+          right: 10,
+          backgroundColor: "white",
+          padding: "10px",
+          border: "1px solid black",
+        }}
+      >
+        <p>剩餘時間: {formatTime(timeLeft)}</p>
+      </div>
       <br />
       <Row justify={"center"}>
         <Divider

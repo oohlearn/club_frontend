@@ -9,6 +9,7 @@ import DOMPurify from "dompurify"; //清理HTML
 import styled from "styled-components";
 import AddressModal from "./AddressModal";
 import SeatsViewComponents from "../../components/Seats.jsx/MSSeatsView";
+import { TimerProvider } from "../../context/TimerContext";
 
 const DetailStyle = styled.div`
   .mapIcon {
@@ -240,98 +241,105 @@ function ActivityDetail() {
   };
 
   return (
-    <EventContext.Provider value={{ eventData }}>
-      <DetailStyle>
-        <Row style={{ textAlign: "center", justifyContent: "center" }}>
-          <TitleComponent label={`| ${eventData.title} |`} />
-        </Row>
-        <br />
-        <Row gutter={20}>
-          <Col span={6}>
-            <img
-              style={{ width: "100%", height: "auto", objectFit: "cover" }}
-              src={eventData.poster}
-              alt=""
-            />
-          </Col>
-          <Col span={18}>
-            <h6>時間 | {eventData.date}</h6>
-            <h6>地點 | {eventData.venue.name} </h6>
-            <p>
-              {"\u3000"}
-              {"\u3000"} {"\u3000"}
-              <Link to={eventData.venue.map_url} target="_blank" rel="noopener noreferrer">
-                <img
-                  className="mapIcon"
-                  src="https://cdn2.iconfinder.com/data/icons/social-media-2259/512/google-512.png"
-                />
-                Google 地圖
-              </Link>
-              {"\u3000"}
-              <OpenAddressModal venue={eventData.venue} />
-            </p>
-            <h6>
-              票價 | {""}
-              {[...new Set(eventData.zone.map((area) => area.price))]
-                .sort((a, b) => a - b)
-                .map(
-                  (price, index, prices) => `${price}${index !== prices.length - 1 ? " / " : ""}`
-                )}
-            </h6>
-            <h6 style={{ display: eventData.ticket_system_url ? "block" : "none" }}>
-              {"\u3000"}
-              {"\u3000"}
-              <Link target="_blank" to={eventData.ticket_system_url}>
-                <Button type="link">
-                  <strong>購票連結</strong>
-                </Button>
-              </Link>
-            </h6>
-
-            <Divider orientation="left" orientationMargin={0}>
-              <strong>節目介紹</strong>
-            </Divider>
-            <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(eventData.description) }}></p>
-
-            <Divider orientation="left" orientationMargin={0}>
-              <strong>演出曲目</strong>
-            </Divider>
-            <Col>
-              <ProgramTable programData={eventData.program} />
+    <TimerProvider>
+      <EventContext.Provider value={{ eventData }}>
+        <DetailStyle>
+          <Row style={{ textAlign: "center", justifyContent: "center" }}>
+            <TitleComponent label={`| ${eventData.title} |`} />
+          </Row>
+          <br />
+          <Row gutter={20}>
+            <Col span={6}>
+              <img
+                style={{ width: "100%", height: "auto", objectFit: "cover" }}
+                src={eventData.poster}
+                alt=""
+              />
             </Col>
-          </Col>
-        </Row>
-        <br />
+            <Col span={18}>
+              <h6>時間 | {eventData.date}</h6>
+              <h6>地點 | {eventData.venue.name} </h6>
+              <p>
+                {"\u3000"}
+                {"\u3000"} {"\u3000"}
+                <Link to={eventData.venue.map_url} target="_blank" rel="noopener noreferrer">
+                  <img
+                    className="mapIcon"
+                    src="https://cdn2.iconfinder.com/data/icons/social-media-2259/512/google-512.png"
+                  />
+                  Google 地圖
+                </Link>
+                {"\u3000"}
+                <OpenAddressModal venue={eventData.venue} />
+              </p>
+              <h6>
+                票價 | {""}
+                {[...new Set(eventData.zone.map((area) => area.price))]
+                  .sort((a, b) => a - b)
+                  .map(
+                    (price, index, prices) => `${price}${index !== prices.length - 1 ? " / " : ""}`
+                  )}
+              </h6>
+              <h6 style={{ display: eventData.ticket_system_url ? "block" : "none" }}>
+                {"\u3000"}
+                {"\u3000"}
+                <Link target="_blank" to={eventData.ticket_system_url}>
+                  <Button type="link">
+                    <strong>購票連結</strong>
+                  </Button>
+                </Link>
+              </h6>
 
-        <Row style={{ display: eventData.ticket_system_url ? "none" : "block" }}>
-          <Divider
-            orientation="center"
-            orientationMargin={0}
+              <Divider orientation="left" orientationMargin={0}>
+                <strong>節目介紹</strong>
+              </Divider>
+              <p
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(eventData.description) }}
+              ></p>
+
+              <Divider orientation="left" orientationMargin={0}>
+                <strong>演出曲目</strong>
+              </Divider>
+              <Col>
+                <ProgramTable programData={eventData.program} />
+              </Col>
+            </Col>
+          </Row>
+          <br />
+
+          <Row style={{ display: eventData.ticket_system_url ? "none" : "block" }}>
+            <Divider
+              orientation="center"
+              orientationMargin={0}
+              style={{ display: eventData.ticket_system_url ? "none" : "block" }}
+            >
+              <h5 style={{ fontWeight: "bold" }}>購票說明</h5>
+            </Divider>
+            <ol>
+              <li>
+                請先選擇欲購票價的<strong>『張數』</strong>，再點選<strong>『選位方式』</strong>
+                ，即可進入訂購確認頁面。
+              </li>
+              <li>單次購票僅能選擇單一票種，若須購買不同票種，請再次下單購買。</li>
+            </ol>
+
+            <SeatsViewComponents display={eventData.ticket_system_url ? "none" : "block"} />
+          </Row>
+
+          <Row
+            justify={"center"}
             style={{ display: eventData.ticket_system_url ? "none" : "block" }}
           >
-            <h5 style={{ fontWeight: "bold" }}>購票說明</h5>
-          </Divider>
-          <ol>
-            <li>
-              請先選擇欲購票價的<strong>『張數』</strong>，再點選<strong>『選位方式』</strong>
-              ，即可進入訂購確認頁面。
-            </li>
-            <li>單次購票僅能選擇單一票種，若須購買不同票種，請再次下單購買。</li>
-          </ol>
-
-          <SeatsViewComponents display={eventData.ticket_system_url ? "none" : "block"} />
-        </Row>
-
-        <Row justify={"center"} style={{ display: eventData.ticket_system_url ? "none" : "block" }}>
-          <TicketTable
-            dataSource={dataSource}
-            handleTicketChange={handleTicketChange}
-            resetTicketCounts={resetTicketCounts}
-          />
-        </Row>
-        <br />
-      </DetailStyle>
-    </EventContext.Provider>
+            <TicketTable
+              dataSource={dataSource}
+              handleTicketChange={handleTicketChange}
+              resetTicketCounts={resetTicketCounts}
+            />
+          </Row>
+          <br />
+        </DetailStyle>
+      </EventContext.Provider>
+    </TimerProvider>
   );
 }
 export default ActivityDetail;

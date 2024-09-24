@@ -82,7 +82,7 @@ function SeatsChooseComponents({ display, handleClick }) {
     if (seat.price === parseInt(price)) {
       color = seat.color;
     }
-    if (seat.not_sell || seat.is_sold) {
+    if (seat.not_sell || seat.status === "sold" || seat.status === "padding") {
       color = "#ADADAD";
     }
     return color;
@@ -96,7 +96,7 @@ function SeatsChooseComponents({ display, handleClick }) {
     if (seat.price === parseInt(price)) {
       color = "#000000";
     }
-    if (seat.not_sell || seat.is_sold) {
+    if (seat.not_sell || seat.status === "sold" || seat.status === "padding") {
       color = "#ADADAD";
     }
     return color;

@@ -71,7 +71,7 @@ function SeatsViewComponents({ display }) {
 
   const getBGColor = (seat) => {
     let color = seat.color;
-    if (seat.not_sell || seat.is_sold) {
+    if (seat.not_sell || seat.status === "sold" || seat.status === "padding") {
       color = "#ADADAD";
     }
     return color;
@@ -79,7 +79,7 @@ function SeatsViewComponents({ display }) {
 
   const getTextColor = (seat) => {
     let color = "#000000"; //初始黑色
-    if (seat.not_sell || seat.is_sold) {
+    if (seat.not_sell || seat.status === "sold" || seat.status === "padding") {
       color = "#ADADAD";
     }
     return color;

@@ -7,6 +7,7 @@ import {
   CameraOutlined,
   UserOutlined,
   LogoutOutlined,
+  DashboardOutlined,
 } from "@ant-design/icons";
 import { Menu, Layout, theme } from "antd";
 import { Link, useNavigate } from "react-router-dom";
@@ -69,9 +70,12 @@ function Sidebar() {
     user
       ? {
           key: "6",
-          icon: <LogoutOutlined />,
-          onClick: handleLogout,
-          label: "登出",
+          icon: <DashboardOutlined />,
+          label: (
+            <Link to="/user/login" style={{ textDecoration: "none" }}>
+              個人頁面
+            </Link>
+          ),
         }
       : {
           key: "6",

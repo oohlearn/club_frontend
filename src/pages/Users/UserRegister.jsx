@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   AutoComplete,
   Button,
@@ -15,6 +15,8 @@ import {
 } from "antd";
 import axios from "axios";
 import TitleComponent from "../../components/TitleComponent";
+import { useAuth } from "../../context/AuthContext";
+
 const { Option } = Select;
 
 const apiUrl = process.env.REACT_APP_API_URL;
@@ -51,6 +53,11 @@ const tailFormItemLayout = {
 };
 
 const UserRegister = () => {
+  const { loginAuth } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from || "/user/dashboard";
+
   const [form] = Form.useForm();
   const onFinish = async (values) => {
     try {
@@ -69,6 +76,17 @@ const UserRegister = () => {
       if (response.status === 201) {
         message.success("表單提交成功！");
         form.resetFields();
+        try {
+          const user = await loginAuth(values.email, values.password);
+          if (user) {
+            message.success("登入成功");
+            navigate(from, { replace: true });
+            console.log("登入成功", { user });
+          }
+        } catch (error) {
+          message.error("登入失敗");
+          console.log("登入失敗", error);
+        }
       } else {
         message.error("提交失敗，請稍後再試。");
       }
@@ -105,7 +123,7 @@ const UserRegister = () => {
 
   return (
     <>
-      <TitleComponent label="購物登入/註冊" />
+      <TitleComponent label="購物 註冊" />
       已有帳號？
       <Link to="/user/login">
         <Button block type="primary" htmlType="submit">

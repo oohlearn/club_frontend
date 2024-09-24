@@ -1,31 +1,35 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Row } from "antd";
+import { Button, Form, Input, Row, message } from "antd";
 import TitleComponent from "../../components/TitleComponent";
 import { useAuth } from "../../context/AuthContext";
 
 const UserLogin = () => {
   const { loginAuth } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from || "/user/dashboard";
 
   const onFinish = async (values) => {
     try {
       const user = await loginAuth(values.email, values.password);
       if (user) {
-        navigate("/user/dashboard");
+        message.success("登入成功");
+        navigate(from, { replace: true });
         console.log("登入成功", { user });
       }
     } catch (error) {
+      message.error("登入失敗");
       console.log("登入失敗", error);
     }
   };
 
   return (
     <>
-      <TitleComponent label="購物登入/註冊" />
+      <TitleComponent label="購物 登入" />
       尚未有帳號？
-      <Link to="/user/register">
+      <Link to="/user/register" state={{ from: from }}>
         <Button block type="primary">
           註冊
         </Button>

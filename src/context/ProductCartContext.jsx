@@ -20,41 +20,76 @@ export function ProductCartProvider({ children }) {
   const [isDiscountApplied, setIsDiscountApplied] = useState(false);
   const [appliedDiscounts, setAppliedDiscounts] = useState({});
 
-  const addToCart = (product, quantity, size) => {
-    setCartItems((prevItems) => {
-      const existingItemIndex = prevItems.findIndex(
-        (item) => item.id === product.id && item.details.size === size
+  const addToCart = async (product, quantity, size) => {
+    try {
+      const response = await axios.post(
+        `${apiUrl}shopping/products/${product.id}/update_pre_sold/`,
+        {
+          quantity: quantity,
+        }
       );
 
-      if (existingItemIndex !== -1) {
-        // If the item already exists, update its quantity
-        const updatedItems = [...prevItems];
-        updatedItems[existingItemIndex].details.qty += quantity;
-        return updatedItems;
+      if (response.data.status === "success") {
+        setCartItems((prevItems) => {
+          const existingItemIndex = prevItems.findIndex(
+            (item) => item.id === product.id && item.details.size === size
+          );
+
+          if (existingItemIndex !== -1) {
+            const updatedItems = [...prevItems];
+            updatedItems[existingItemIndex].details.qty += quantity;
+            return updatedItems;
+          } else {
+            const newItem = {
+              ...product,
+              details: {
+                qty: quantity,
+                size: size || "單一尺寸",
+              },
+            };
+            return [...prevItems, newItem];
+          }
+        });
+        message.success("商品已加入購物車");
       } else {
-        // If it's a new item, add it to the cart
-        const newItem = {
-          ...product,
-          details: {
-            qty: quantity,
-            size: size || "單一尺寸",
-          },
-        };
-        if (newItem.details.size === "單一尺寸" && product.size_list.length > 0) {
-          message.warning("請選擇尺寸或顏色");
-        }
-        return [...prevItems, newItem];
+        message.error(response.data.message || "加入購物車失敗，請稍後再試");
       }
-    });
-    console.log(cartItems);
+    } catch (error) {
+      console.error("加入購物車時發生錯誤:", error);
+      message.error("加入購物車失敗，請稍後再試");
+    }
   };
 
-  const removeFromCart = (productId, size, index) => {
-    setCartItems((prevItems) =>
-      prevItems.filter(
-        (item) => !(item.index === index && item.id === productId && item.details.size === size)
-      )
-    );
+  const removeFromCart = async (productId, size, index) => {
+    try {
+      const itemToRemove = cartItems.find(
+        (item) => item.id === productId && item.details.size === size && item.index === index
+      );
+
+      if (itemToRemove) {
+        const response = await axios.post(
+          `${apiUrl}shopping/products/${productId}/release_pre_sold/`,
+          {
+            quantity: itemToRemove.details.qty,
+          }
+        );
+
+        if (response.data.status === "success") {
+          setCartItems((prevItems) =>
+            prevItems.filter(
+              (item) =>
+                !(item.index === index && item.id === productId && item.details.size === size)
+            )
+          );
+          message.success("商品已從購物車移除");
+        } else {
+          message.error("移除商品失敗，請稍後再試");
+        }
+      }
+    } catch (error) {
+      console.error("從購物車移除商品時發生錯誤:", error);
+      message.error("移除商品失敗，請稍後再試");
+    }
   };
 
   const getTotalAmount = () => {
@@ -138,7 +173,7 @@ export function ProductCartProvider({ children }) {
         product_code: discountCodes.productCode,
       };
 
-      const response = await axios.post("http://your-backend-api-url/api/orders/", orderData);
+      const response = await axios.post(`${apiUrl}shopping/order`, orderData);
       return response.data;
     } catch (error) {
       console.error("Error submitting order:", error);

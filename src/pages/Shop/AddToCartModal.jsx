@@ -39,7 +39,6 @@ const AddToCartModal = ({ loading, setOpen, open, product }) => {
       return;
     }
     addToCart(product, selectedQty, selectedSize);
-    message.success("成功加入購物車");
     setOpen(false);
   };
   return (

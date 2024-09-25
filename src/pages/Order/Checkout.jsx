@@ -10,13 +10,6 @@ import { useCart } from "../../context/CartContext";
 
 const current = 0;
 
-const orderData = [
-  {
-    index: 1,
-    "2024DVD": 1,
-  },
-];
-
 // TODO 票券和商品的優惠碼欄位
 
 const StepsComponent = ({ cartItems, choiceSeats }) => {
@@ -51,13 +44,7 @@ const StepsComponent = ({ cartItems, choiceSeats }) => {
   };
   return (
     <>
-      <Steps
-        current={current}
-        items={items}
-        cartItems={cartItems}
-        orderData={orderData}
-        style={{ width: "60%", marginLeft: "50px" }}
-      />
+      <Steps current={current} items={items} style={{ width: "60%", marginLeft: "50px" }} />
       <div style={contentStyle}>{steps[current].content}</div>
       <div
         style={{
@@ -97,13 +84,6 @@ function Checkout() {
   const { getProductDiscountTotal, removeFromCart } = useProductCart();
   const { getTicketDiscountTotal, removeTicketFromCart } = useTicketCart();
   const { productItems, ticketItems, getTotalAmount, getDiscountTotal, clearCart } = useCart();
-
-  // 检查 Data 是否存在
-  if (!orderData) {
-    // 如果活动不存在，可以重定向到一个错误页面或者首页
-    navigate("/");
-    return null;
-  }
 
   return (
     <>

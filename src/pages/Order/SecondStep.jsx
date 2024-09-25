@@ -8,6 +8,7 @@ import { useProductCart } from "../../context/ProductCartContext";
 import { useTicketCart } from "../../context/TicketCartContext";
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
+import TimerDisplay from "../../components/TimeDisplay";
 const ListItem = styled(List.Item)`
   display: flex;
   justify-content: space-between;
@@ -213,6 +214,7 @@ export const SecondStep = () => {
   };
   return (
     <Row style={{ marginTop: "10px" }}>
+      {ticketItems?.length > 0 ? <TimerDisplay /> : ""}
       <Col span={16} offset={2}>
         <ShoppingList />
         <br />

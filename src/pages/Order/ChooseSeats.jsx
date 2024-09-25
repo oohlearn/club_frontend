@@ -18,6 +18,7 @@ import SeatsChooseComponents from "../../components/Seats.jsx/MSChoiceSeats";
 import TicketCartDrawer from "../Activities/TicketCartDrawer";
 import { useTicketCart } from "../../context/TicketCartContext";
 import { useTimer } from "../../context/TimerContext";
+import TimerDisplay from "../../components/TimeDisplay";
 
 const SeatsViewStyle = styled.div`
   .seat {
@@ -60,18 +61,7 @@ function ChooseSeats() {
 
   return (
     <>
-      <div
-        style={{
-          position: "fixed",
-          top: 10,
-          right: 10,
-          backgroundColor: "white",
-          padding: "10px",
-          border: "1px solid black",
-        }}
-      >
-        <p>剩餘時間: {formatTime(timeLeft)}</p>
-      </div>
+      <TimerDisplay />
       <br />
       <Row justify={"center"}>
         <Divider

@@ -4,7 +4,9 @@ import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Row, message } from "antd";
 import TitleComponent from "../../components/TitleComponent";
 import { useAuth } from "../../context/AuthContext";
+import TimerDisplay from "../../components/TimeDisplay";
 
+// TODO 購物跳轉後的路徑不對
 const UserLogin = () => {
   const { loginAuth } = useAuth();
   const navigate = useNavigate();
@@ -28,6 +30,7 @@ const UserLogin = () => {
   return (
     <>
       <TitleComponent label="購物 登入" />
+      {ticketItems?.length > 0 ? <TimerDisplay /> : ""}
       尚未有帳號？
       <Link to="/user/register" state={{ from: from }}>
         <Button block type="primary">

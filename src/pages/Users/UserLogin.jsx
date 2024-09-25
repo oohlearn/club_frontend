@@ -4,6 +4,7 @@ import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Row, message } from "antd";
 import TitleComponent from "../../components/TitleComponent";
 import { useAuth } from "../../context/AuthContext";
+import { useTicketCart } from "../../context/TicketCartContext";
 import TimerDisplay from "../../components/TimeDisplay";
 
 // TODO 購物跳轉後的路徑不對
@@ -12,6 +13,8 @@ const UserLogin = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from || "/user/dashboard";
+
+  const { ticketItems } = useTicketCart();
 
   const onFinish = async (values) => {
     try {

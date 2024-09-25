@@ -325,10 +325,12 @@ function ActivityDetail() {
 
             <SeatsViewComponents display={eventData.ticket_system_url ? "none" : "block"} />
           </Row>
-          {eventData.is_sold ? (
+          {eventData.on_sell ? (
             <Row
               justify={"center"}
-              style={{ display: eventData.ticket_system_url ? "none" : "block" }}
+              style={{
+                display: eventData.ticket_system_url ? "none" : "block",
+              }}
             >
               <TicketTable
                 dataSource={dataSource}

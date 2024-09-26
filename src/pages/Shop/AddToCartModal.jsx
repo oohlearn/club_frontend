@@ -19,14 +19,14 @@ const selectOptions = Array.from({ length: 11 }, (_, i) => ({ value: i, label: i
 const AddToCartModal = ({ loading, setOpen, open, product }) => {
   const [sizeOptions, setSizeOptions] = useState([]);
   const [selectedQty, setSelectedQty] = useState(1);
-  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedSize, setSelectedSize] = useState();
   const { addToCart } = useProductCart();
 
   useEffect(() => {
     if (product?.size_list) {
       const options = product.size_list.map((item) => ({
         label: `${item.size} ${item.description}`,
-        value: item.size,
+        value: item.id,
       }));
       setSizeOptions(options);
       setSelectedSize(options[0]?.value || ""); // 設置默認尺寸
@@ -84,12 +84,20 @@ const AddToCartModal = ({ loading, setOpen, open, product }) => {
         >
           尺寸：
           <Col>（不同尺寸或顏色，請分別加入購物車）</Col>
-          <Select
-            className="sizeOption"
-            onChange={(value) => setSelectedSize(value)}
-            size="small"
-            options={sizeOptions}
-          ></Select>
+          <ConfigProvider
+            theme={{
+              components: {
+                Select: { optionPadding: "15" },
+              },
+            }}
+          >
+            <Select
+              className="sizeOption"
+              onChange={(value) => setSelectedSize(value)}
+              size="small"
+              options={sizeOptions}
+            ></Select>
+          </ConfigProvider>
         </Row>
       </Modal>
     </ModalStyle>

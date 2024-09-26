@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Row, Col, Button, Drawer, List, Divider, ConfigProvider } from "antd";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { useProductCart } from "../../context/ProductCartContext";
 
 const CartDrawer = ({ cartItems, removeFromCart }) => {
   const [open, setOpen] = useState(false);
@@ -29,7 +30,7 @@ const CartDrawer = ({ cartItems, removeFromCart }) => {
     }
     return cartItems.reduce((total, item) => {
       const price = item.on_discount ? item.discount_price : item.price;
-      return total + price * item.details.qty;
+      return total + price * item.details.quantity;
     }, 0);
   };
 
@@ -83,16 +84,18 @@ const CartDrawer = ({ cartItems, removeFromCart }) => {
                 <List.Item>
                   <div>
                     <Button
-                      onClick={() => removeFromCart(item.id, item.details.size, item.index)}
+                      onClick={() =>
+                        removeFromCart(item.id, item.details.quantity, item.details.sizeId)
+                      }
                       size="small"
                     >
                       X
                     </Button>
                   </div>
                   <span>{item.name}</span>
-                  <span>{item.details.qty}件</span>
+                  <span>{item.details.quantity}件</span>
                   <span>
-                    <span>尺寸：{item.details.size || "單一尺寸"}</span>
+                    <span>尺寸：{item.details.sizeId || "單一尺寸"}</span>
                     <br />
                     <span>單價：NT$ {item.on_discount ? item.discount_price : item.price}</span>
                   </span>

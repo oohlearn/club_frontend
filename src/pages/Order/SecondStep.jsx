@@ -188,7 +188,7 @@ export const SecondStep = () => {
       cartItems: productItems.map((item) => ({
         product: item.id,
         size: item.details.size,
-        quantity: item.details.qty,
+        quantity: item.details.size.qty,
       })),
       ticketItems: ticketItems.map((item) => ({
         seat: item.row_num ? item.id : null,

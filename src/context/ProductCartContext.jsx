@@ -7,7 +7,6 @@ const apiUrl = process.env.REACT_APP_API_URL;
 const ProductCartContext = createContext();
 
 // TODO 要選尺寸才能加入購物車
-// TODO 同品項會重複出現
 export function ProductCartProvider({ children }) {
   const [cartItems, setCartItems] = useState(() => {
     // 從 localStorage 讀取購物車資料
@@ -20,10 +19,11 @@ export function ProductCartProvider({ children }) {
   const [isDiscountApplied, setIsDiscountApplied] = useState(false);
   const [appliedDiscounts, setAppliedDiscounts] = useState({});
 
-  const addToCart = async (product, quantity, size) => {
+  const addToCart = async (product, quantity, sizeId) => {
     try {
       const response = await axios.post(
-        `${apiUrl}shopping/products/${product.id}/update_pre_sold/`,
+        `${apiUrl}shopping/products/${product.id}/sizes/${sizeId}/pre_sold/`,
+
         {
           quantity: quantity,
         }
@@ -32,19 +32,19 @@ export function ProductCartProvider({ children }) {
       if (response.data.status === "success") {
         setCartItems((prevItems) => {
           const existingItemIndex = prevItems.findIndex(
-            (item) => item.id === product.id && item.details.size === size
+            (item) => item.id === product.id && item.details.sizeId === sizeId
           );
 
           if (existingItemIndex !== -1) {
             const updatedItems = [...prevItems];
-            updatedItems[existingItemIndex].details.qty += quantity;
+            updatedItems[existingItemIndex].details.quantity += quantity;
             return updatedItems;
           } else {
             const newItem = {
               ...product,
               details: {
-                qty: quantity,
-                size: size || "單一尺寸",
+                quantity: quantity,
+                sizeId: sizeId,
               },
             };
             return [...prevItems, newItem];
@@ -60,26 +60,33 @@ export function ProductCartProvider({ children }) {
     }
   };
 
-  const removeFromCart = async (productId, size, index) => {
+  const getSize = async (product, sizeId) => {
+    try {
+      const response = await axios.get(`${apiUrl}shopping/products/${product.id}/sizes/${sizeId}/`);
+      const size = response.data.size;
+      return size;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const removeFromCart = async (productId, quantity, sizeId) => {
     try {
       const itemToRemove = cartItems.find(
-        (item) => item.id === productId && item.details.size === size && item.index === index
+        (item) => item.id === productId && item.details.sizeId === sizeId
       );
 
       if (itemToRemove) {
         const response = await axios.post(
-          `${apiUrl}shopping/products/${productId}/release_pre_sold/`,
+          `${apiUrl}shopping/products/${productId}/sizes/${sizeId}/release_pre_sold/`,
           {
-            quantity: itemToRemove.details.qty,
+            quantity: itemToRemove.details.quantity,
           }
         );
 
         if (response.data.status === "success") {
           setCartItems((prevItems) =>
-            prevItems.filter(
-              (item) =>
-                !(item.index === index && item.id === productId && item.details.size === size)
-            )
+            prevItems.filter((item) => !(item.id === productId && item.details.sizeId === sizeId))
           );
           message.success("商品已從購物車移除");
         } else {
@@ -98,7 +105,7 @@ export function ProductCartProvider({ children }) {
     }
     return cartItems.reduce((total, item) => {
       const price = item.on_discount ? item.discount_price : item.price;
-      return total + price * item.details.qty;
+      return total + price * item.details.quantity;
     }, 0);
   };
 
@@ -163,7 +170,7 @@ export function ProductCartProvider({ children }) {
         cartItems: cartItems.map((item) => ({
           product: item.id,
           size: item.details.size,
-          quantity: item.details.qty,
+          quantity: item.details.size.quantity,
         })),
         ticketItems: ticketItems.map((item) => ({
           seat: item.row_num ? item.id : null,
@@ -195,6 +202,7 @@ export function ProductCartProvider({ children }) {
         applyDiscountCode,
         isDiscountApplied,
         appliedDiscounts,
+        getSize,
       }}
     >
       {children}

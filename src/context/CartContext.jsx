@@ -49,7 +49,7 @@ export const CartProvider = ({ children }) => {
         cartItems: productItems.map((item) => ({
           product: item.id,
           size: item.details.size,
-          quantity: item.details.qty,
+          quantity: item.details.quantity,
         })),
         ticketItems: ticketItems.map((item) => ({
           seat: item.row_num ? item.id : null,

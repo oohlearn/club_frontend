@@ -105,14 +105,16 @@ const CartDrawer = ({ cartItems, removeFromCart, getTotalAmount, productId }) =>
                 <List.Item>
                   <div style={{ marginRight: "1px" }}>
                     <Button
-                      onClick={() => removeFromCart(item.id, item.details.size, item.index)}
+                      onClick={() =>
+                        removeFromCart(item.id, item.details.quantity, item.details.sizeId)
+                      }
                       size="small"
                     >
                       X
                     </Button>
                   </div>
                   <span style={{ margin: "5px" }}>{item.name}</span>
-                  <span>{item.details.qty} 件</span>
+                  <span>{item.details.quantity} 件</span>
                   <span style={{ margin: "0 20px" }}>
                     <span>尺寸：{item.details.size || "單一尺寸"}</span>
                     <br />
@@ -123,7 +125,7 @@ const CartDrawer = ({ cartItems, removeFromCart, getTotalAmount, productId }) =>
             />
             <Divider />
             <h5>總金額：NT$ {getTotalAmount()} </h5>
-            <p>商品及票券總金額超過500元，免運費100元</p>
+            <p>商品總金額超過500元或購買任一活動票券，免運費100元</p>
             <Link to="/activities">
               <Button style={{ marginRight: "20px" }}>購票</Button>
             </Link>
@@ -145,7 +147,7 @@ function ProductDetail() {
   const [sizeOptions, setSizeOptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedQty, setSelectedQty] = useState(1);
-  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedSize, setSelectedSize] = useState();
   const apiUrl = process.env.REACT_APP_API_URL;
   const { productId } = useParams();
   const { addToCart, cartItems, removeFromCart, getTotalAmount } = useProductCart();
@@ -166,9 +168,10 @@ function ProductDetail() {
     if (productData.size_list) {
       const options = productData.size_list.map((item) => ({
         label: `${item.size} ${item.description ? item.description : ""}`,
-        value: item.size,
+        value: item.id,
       }));
       setSizeOptions(options);
+      setSelectedSize(options[0]?.value || ""); // 設置默認尺寸
     }
   }, [productData]);
 
@@ -183,9 +186,11 @@ function ProductDetail() {
   //TODO 检查购物车中是否已经存在相同的商品（通过产品ID和尺寸判断）
 
   const handleClick = () => {
+    if (productData.size_list.length > 0 && !selectedSize) {
+      message.warning("請選擇尺寸或顏色");
+      return;
+    }
     addToCart(productData, selectedQty, selectedSize);
-
-    message.success("成功加入購物車");
   };
   return (
     <DetailStyle>

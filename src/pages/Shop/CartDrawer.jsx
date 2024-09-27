@@ -95,7 +95,7 @@ const CartDrawer = ({ cartItems, removeFromCart }) => {
                   <span>{item.name}</span>
                   <span>{item.details.quantity}件</span>
                   <span>
-                    <span>尺寸：{item.details.sizeId || "單一尺寸"}</span>
+                    <span>尺寸：{item.details.size}</span>
                     <br />
                     <span>單價：NT$ {item.on_discount ? item.discount_price : item.price}</span>
                   </span>

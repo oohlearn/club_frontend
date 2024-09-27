@@ -39,7 +39,7 @@ const CartIconStyled = styled.div`
   }
 `;
 
-function OpenAddModal({ product }) {
+function OpenAddModal({ productData }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const showLoading = () => {
@@ -82,7 +82,7 @@ function OpenAddModal({ product }) {
       </div>
       <AddToCartModal
         handleClick={handleClick}
-        product={product}
+        productData={productData}
         loading={loading}
         setOpen={setOpen}
         open={open}
@@ -98,8 +98,8 @@ function ProductComponent({ productsData }) {
   return (
     <ListStyle>
       <Row justify="space-between">
-        {productsData.map((product) => (
-          <Col key={product.id} span={12}>
+        {productsData.map((productData) => (
+          <Col key={productData.id} span={12}>
             <ConfigProvider
               theme={{
                 token: {
@@ -118,7 +118,7 @@ function ProductComponent({ productsData }) {
                   <div style={{ position: "relative" }}>
                     <Image
                       alt="example"
-                      src={product.index_image}
+                      src={productData.index_image}
                       preview={false}
                       style={{
                         width: 150,
@@ -126,15 +126,15 @@ function ProductComponent({ productsData }) {
                         objectFit: "contain",
                       }}
                     />
-                    <OpenAddModal product={product} />
+                    <OpenAddModal productData={productData} />
                   </div>
                 }
               >
-                <Link className="link" to={`/shop/${product.id}`}>
+                <Link className="link" to={`/shop/${productData.id}`}>
                   <Row>
                     <Col span={18}>
-                      <Meta title={<h6 className="title">{product.title}</h6>} />
-                      <Meta description={<h6>NT${product.price}</h6>} />
+                      <Meta title={<h6 className="title">{productData.title}</h6>} />
+                      <Meta description={<h6>NT${productData.price}</h6>} />
                     </Col>
                     <Col span={6}>詳情</Col>
                   </Row>

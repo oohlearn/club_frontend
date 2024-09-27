@@ -1,75 +1,91 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
-import { useParams } from "react-router-dom";
+import React, { createContext, useState, useContext, useEffect } from "react";
 import axios from "axios";
 import { message } from "antd";
-import { useProductCart } from "./ProductCartContext";
-const ProductsContext = createContext();
 
-export const ProductsProvider = ({ children }) => {
-  const [productData, setProductData] = useState([]);
+const ProductContext = createContext();
+
+export const useProductContext = () => useContext(ProductContext);
+
+export const ProductProvider = ({ children }) => {
+  const [productData, setProductData] = useState({ size_list: [] });
+  const [loading, setLoading] = useState(true);
+  const [cartItems, setCartItems] = useState([]);
   const [sizeOptions, setSizeOptions] = useState([]);
   const apiUrl = process.env.REACT_APP_API_URL;
-  const [loading, setLoading] = useState(true);
-  const { addToCart, cartItems, removeFromCart, getTotalAmount } = useProductCart();
-  const [selectedQty, setSelectedQty] = useState(1);
-  const [selectedSize, setSelectedSize] = useState("");
 
-  const { productId } = useParams();
-
-  const getProductDetail = async () => {
+  const getProductDetail = async (productId) => {
     try {
+      setLoading(true);
       const response = await axios.get(`${apiUrl}shopping/products/${productId}/`);
-      console.log(response.data);
       setProductData(response.data);
+      updateSizeOptions(response.data.size_list);
     } catch (error) {
-      console.log(error);
+      console.error("獲取商品詳情時出錯:", error);
+      message.error("獲取商品詳情失敗");
     } finally {
-      setLoading(false); // 数据加载完成后或请求出错后设置 loading 为 false
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (productData.size_list) {
-      const options = productData.size_list.map((item) => ({
-        label: `${item.size} ${item.description ? item.description : ""}`,
-        value: item.size,
-      }));
-      setSizeOptions(options);
+  const updateSizeOptions = (sizeList) => {
+    const options = sizeList.map((item) => ({
+      label: `${item.size} ${item.description ? item.description : ""}`,
+      value: item.id,
+    }));
+    setSizeOptions(options);
+  };
+
+  const addToCart = (product, quantity, sizeId) => {
+    const existingItemIndex = cartItems.findIndex(
+      (item) => item.id === product.id && item.details.sizeId === sizeId
+    );
+
+    if (existingItemIndex !== -1) {
+      const updatedCartItems = [...cartItems];
+      updatedCartItems[existingItemIndex].details.quantity += quantity;
+      setCartItems(updatedCartItems);
+    } else {
+      const newItem = {
+        id: product.id,
+        name: product.title,
+        price: product.on_discount ? product.discount_price : product.price,
+        details: {
+          quantity: quantity,
+          sizeId: sizeId,
+          size: product.size_list.find((size) => size.id === sizeId)?.size || "",
+        },
+      };
+      setCartItems([...cartItems, newItem]);
     }
-  }, [productData]);
+    message.success("成功加入購物車！");
+  };
 
-  useEffect(() => {
-    getProductDetail();
-  }, [productId]);
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  const removeFromCart = (productId, quantity, sizeId) => {
+    const updatedCartItems = cartItems.filter(
+      (item) => !(item.id === productId && item.details.sizeId === sizeId)
+    );
+    setCartItems(updatedCartItems);
+  };
 
-  const handleClick = () => {
-    addToCart(productData, selectedQty, selectedSize);
-
-    message.success("成功加入購物車");
+  const getTotalAmount = () => {
+    return cartItems.reduce((total, item) => total + item.price * item.details.quantity, 0);
   };
 
   return (
-    <ProductsContext.Provider
+    <ProductContext.Provider
       value={{
-        getProductDetail,
-        cartItems,
-        addToCart,
         productData,
-        sizeOptions,
         loading,
-        selectedQty,
-        selectedSize,
-        handleClick,
+        cartItems,
+        sizeOptions,
+        getProductDetail,
+        addToCart,
+        removeFromCart,
+        getTotalAmount,
+        updateSizeOptions,
       }}
     >
       {children}
-    </ProductsContext.Provider>
+    </ProductContext.Provider>
   );
 };
-
-export function useProduct() {
-  return useContext(ProductsContext);
-}

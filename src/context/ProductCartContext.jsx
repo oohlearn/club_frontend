@@ -21,9 +21,12 @@ export function ProductCartProvider({ children }) {
 
   const addToCart = async (product, quantity, sizeId) => {
     try {
+      const sizeResponse = await axios.get(
+        `${apiUrl}shopping/products/${product.id}/sizes/${sizeId}/`
+      );
+      const sizeData = sizeResponse.data.size;
       const response = await axios.post(
         `${apiUrl}shopping/products/${product.id}/sizes/${sizeId}/pre_sold/`,
-
         {
           quantity: quantity,
         }
@@ -45,28 +48,21 @@ export function ProductCartProvider({ children }) {
               details: {
                 quantity: quantity,
                 sizeId: sizeId,
+                size: sizeData,
               },
             };
             return [...prevItems, newItem];
           }
         });
         message.success("商品已加入購物車");
+      } else if (!sizeId) {
+        message.warning("請選擇尺寸");
       } else {
         message.error(response.data.message || "加入購物車失敗，請稍後再試");
       }
     } catch (error) {
       console.error("加入購物車時發生錯誤:", error);
       message.error("加入購物車失敗，請稍後再試");
-    }
-  };
-
-  const getSize = async (product, sizeId) => {
-    try {
-      const response = await axios.get(`${apiUrl}shopping/products/${product.id}/sizes/${sizeId}/`);
-      const size = response.data.size;
-      return size;
-    } catch (error) {
-      console.log(error);
     }
   };
 
@@ -202,7 +198,6 @@ export function ProductCartProvider({ children }) {
         applyDiscountCode,
         isDiscountApplied,
         appliedDiscounts,
-        getSize,
       }}
     >
       {children}

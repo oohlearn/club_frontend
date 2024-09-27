@@ -1,7 +1,6 @@
 import DOMPurify from "dompurify"; //清理HTML
 import TitleComponent from "../../components/TitleComponent";
 
-import axios from "axios";
 import React, { useState, useEffect, useContext } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
@@ -18,6 +17,7 @@ import {
 } from "antd";
 import styled from "styled-components";
 import { useProductCart } from "../../context/ProductCartContext";
+import { useProductContext } from "../../context/ProductContext";
 
 const DetailStyle = styled.div`
   .photo_image {
@@ -116,7 +116,7 @@ const CartDrawer = ({ cartItems, removeFromCart, getTotalAmount, productId }) =>
                   <span style={{ margin: "5px" }}>{item.name}</span>
                   <span>{item.details.quantity} 件</span>
                   <span style={{ margin: "0 20px" }}>
-                    <span>尺寸：{item.details.size || "單一尺寸"}</span>
+                    <span>尺寸：{item.details.size}</span>
                     <br />
                     <span>單價：NT$ {item.on_discount ? item.discount_price : item.price}</span>
                   </span>
@@ -142,55 +142,34 @@ const CartDrawer = ({ cartItems, removeFromCart, getTotalAmount, productId }) =>
 const selectOptions = Array.from({ length: 11 }, (_, i) => ({ value: i, label: i }));
 
 function ProductDetail() {
-  const [productData, setProductData] = useState({ size_list: [] });
-
-  const [sizeOptions, setSizeOptions] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [selectedQty, setSelectedQty] = useState(1);
   const [selectedSize, setSelectedSize] = useState();
-  const apiUrl = process.env.REACT_APP_API_URL;
   const { productId } = useParams();
   const { addToCart, cartItems, removeFromCart, getTotalAmount } = useProductCart();
-
-  const getProductDetail = async () => {
-    try {
-      const response = await axios.get(`${apiUrl}shopping/products/${productId}/`);
-      console.log(response.data);
-      setProductData(response.data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false); // 数据加载完成后或请求出错后设置 loading 为 false
-    }
-  };
+  const { productData, loading, getProductDetail, sizeOptions } = useProductContext();
 
   useEffect(() => {
-    if (productData.size_list) {
-      const options = productData.size_list.map((item) => ({
-        label: `${item.size} ${item.description ? item.description : ""}`,
-        value: item.id,
-      }));
-      setSizeOptions(options);
-      setSelectedSize(options[0]?.value || ""); // 設置默認尺寸
+    getProductDetail(productId);
+  }, [productId]);
+
+  useEffect(() => {
+    if (productData?.size_list && productData.size_list.length < 2) {
+      setSelectedSize(productData.size_list[0]?.id);
     }
   }, [productData]);
 
-  useEffect(() => {
-    getProductDetail();
-    console.log(productData);
-  }, [productId]);
   if (loading || !productData) {
     return <div>Loading...</div>;
   }
-  // 加入購物車
-  //TODO 检查购物车中是否已经存在相同的商品（通过产品ID和尺寸判断）
 
+  // 加入購物車
   const handleClick = () => {
-    if (productData.size_list.length > 0 && !selectedSize) {
+    if (productData.size_list.length > 1 && !selectedSize) {
       message.warning("請選擇尺寸或顏色");
       return;
+    } else {
+      addToCart(productData, selectedQty, selectedSize);
     }
-    addToCart(productData, selectedQty, selectedSize);
   };
   return (
     <DetailStyle>
@@ -264,7 +243,7 @@ function ProductDetail() {
                   <Select
                     className="sizeOption"
                     size="small"
-                    options={sizeOptions ? sizeOptions : "單一尺寸"}
+                    options={sizeOptions}
                     onChange={(value) => setSelectedSize(value)}
                   ></Select>
                 </ConfigProvider>

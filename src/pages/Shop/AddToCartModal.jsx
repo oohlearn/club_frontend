@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 
 import { Button, Modal, message, Image, Row, ConfigProvider, Select, Col } from "antd";
 import styled from "styled-components";
+import { useProductContext } from "../../context/ProductContext";
 import { useProductCart } from "../../context/ProductCartContext";
 const ModalStyle = styled.div`
   h6 {
@@ -15,34 +15,37 @@ const ModalStyle = styled.div`
 `;
 const selectOptions = Array.from({ length: 11 }, (_, i) => ({ value: i, label: i }));
 
-// TODO OK按鈕刪掉
-const AddToCartModal = ({ loading, setOpen, open, product }) => {
-  const [sizeOptions, setSizeOptions] = useState([]);
+const AddToCartModal = ({ loading, setOpen, open, productData }) => {
   const [selectedQty, setSelectedQty] = useState(1);
   const [selectedSize, setSelectedSize] = useState();
+  const [sizeOptions, setSizeOptions] = useState([]);
+
   const { addToCart } = useProductCart();
 
+  const { getProductDetail, updateSizeOptions } = useProductContext();
+
   useEffect(() => {
-    if (product?.size_list) {
-      const options = product.size_list.map((item) => ({
-        label: `${item.size} ${item.description}`,
-        value: item.id,
-      }));
-      setSizeOptions(options);
-      setSelectedSize(options[0]?.value || ""); // 設置默認尺寸
+    const options = productData.size_list.map((item) => ({
+      label: `${item.size} ${item.description ? item.description : ""}`,
+      value: item.id,
+    }));
+    setSizeOptions(options);
+    if (productData?.size_list?.length < 2) {
+      setSelectedSize(productData.size_list[0]["id"]);
     }
-  }, [product]);
+  }, [productData]);
 
   const handleAddToCart = () => {
-    if (product.size_list.length > 0 && !selectedSize) {
+    if (productData.size_list.length > 1 && !selectedSize) {
       message.warning("請選擇尺寸或顏色");
       return;
+    } else {
+      addToCart(productData, selectedQty, selectedSize);
+      setOpen(false);
     }
-    addToCart(product, selectedQty, selectedSize);
-    setOpen(false);
   };
   return (
-    <ModalStyle>
+    <>
       <Modal
         title={<p>請選擇商品規格</p>}
         loading={loading}
@@ -52,9 +55,9 @@ const AddToCartModal = ({ loading, setOpen, open, product }) => {
         cancelText="關閉視窗"
         onOk={handleAddToCart}
       >
-        <Image preview={false} width={200} src={product.index_image} />
-        <h3>{product.title}</h3>
-        <h6>NT$ {product.price}</h6>
+        <Image preview={false} width={200} src={productData.index_image} />
+        <h3>{productData.title}</h3>
+        <h6>NT$ {productData.price}</h6>
         <Row>
           <h6>數量：</h6>
           <ConfigProvider
@@ -77,17 +80,17 @@ const AddToCartModal = ({ loading, setOpen, open, product }) => {
         <br />
         <Row
           style={{
-            display: product?.size_list.length > 0 ? "block" : "none",
             color: "orange",
             fontWeight: "bold",
           }}
         >
           尺寸：
           <Col>（不同尺寸或顏色，請分別加入購物車）</Col>
+          <br />
           <ConfigProvider
             theme={{
               components: {
-                Select: { optionPadding: "15" },
+                Select: { optionPadding: "5" },
               },
             }}
           >
@@ -100,7 +103,7 @@ const AddToCartModal = ({ loading, setOpen, open, product }) => {
           </ConfigProvider>
         </Row>
       </Modal>
-    </ModalStyle>
+    </>
   );
 };
 export default AddToCartModal;

@@ -46,16 +46,18 @@ const ShoppingList = () => {
             <ListItem>
               <span>
                 <Button
-                  onClick={() => removeFromCart(item.id, item.details.size, item.index)}
+                  onClick={() =>
+                    removeFromCart(item.id, item.details.quantity, item.details.sizeId)
+                  }
                   size="small"
                 >
                   X
                 </Button>
               </span>
               <span style={{ margin: "0 10px" }}>{item.name}</span>
-              <span style={{ margin: "0 10px" }}>{item.details.qty} 件</span>
+              <span style={{ margin: "0 10px" }}>{item.details.quantity} 件</span>
               <span style={{ marginLeft: "20px" }}>
-                <Col>尺寸：{item.details.size || "單一尺寸"}</Col>
+                <Col>尺寸：{item.details.size}</Col>
                 <Col>單價：NT$ {item.on_discount ? item.discount_price : item.price}</Col>
               </span>
             </ListItem>

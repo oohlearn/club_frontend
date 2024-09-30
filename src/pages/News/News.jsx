@@ -11,7 +11,7 @@ const apiUrl = process.env.REACT_APP_API_URL;
 
 function News() {
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10); // 預設每頁顯示10項
+  const [pageSize, setPageSize] = useState(5); // 預設每頁顯示10項
   const [newsData, setNewsData] = useState();
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
@@ -19,11 +19,11 @@ function News() {
   const getNewsData = async (page, size) => {
     try {
       const response = await axios.get(
-        `${apiUrl}information/articles/?page=${page}&page_size=${size}`
+        `${apiUrl}information/articles/?page=${page}&page_size=${pageSize}`
       );
       setNewsData(response.data.articles);
       setTotalItems(response.data.total); // 假設 API 返回總項目
-      console.log(response.data);
+      console.log({ totalItems });
     } catch (error) {
       console.log(error);
     } finally {
@@ -31,14 +31,15 @@ function News() {
     }
   };
 
-  useEffect(() => {
-    getNewsData(currentPage, pageSize);
-  }, [currentPage, pageSize]);
-
   const handlePageChange = (page, size) => {
     setCurrentPage(page);
     setPageSize(size);
   };
+
+  useEffect(() => {
+    getNewsData(currentPage, pageSize);
+  }, [currentPage, pageSize]);
+
   return (
     <>
       <TitleComponent label={"最新消息"} />

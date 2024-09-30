@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 
 import { Link } from "react-router-dom";
 import { Card, Col, ConfigProvider, Row } from "antd";
 import styled from "styled-components";
-import axios from "axios";
 
 const StyleLink = styled(Link)`
   text-decoration: none;
@@ -11,23 +10,10 @@ const StyleLink = styled(Link)`
 
 const { Meta } = Card;
 
-function AlbumsComponent() {
-  const [albumsData, setAlbumsData] = useState([]);
-  const apiUrl = process.env.REACT_APP_API_URL;
-
-  const getAlbumsData = async () => {
-    try {
-      const response = await axios.get(`${apiUrl}information/albums/`);
-      console.log(response.data.albums);
-      const sortedData = response.data.albums.sort((a, b) => new Date(b.date) - new Date(a.date));
-      setAlbumsData(sortedData);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  useEffect(() => {
-    getAlbumsData();
-  }, []);
+function AlbumsComponent({ albumsData, loading }) {
+  if (loading) {
+    return <div>Loading...</div>;
+  }
   return (
     <>
       <Row gutter={8}>
@@ -46,7 +32,7 @@ function AlbumsComponent() {
                   style={{
                     width: 240,
                     height: "auto",
-                    padding: 0,
+                    padding: 10,
                   }}
                   cover={<img alt="example" src={album.indexImage} />}
                 >

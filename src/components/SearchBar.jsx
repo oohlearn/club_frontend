@@ -18,8 +18,7 @@ const SearchContainer = styled.div`
   align-items: center;
 `;
 
-const onSearch = (value, _e, info) => console.log(info?.source, value);
-const SearchBar = () => {
+const SearchBar = ({ onSearch, onDateRangeChange }) => {
   const [showCalendar, setCalendar] = useState(false);
   const openDatePicker = () => {
     setCalendar((preState) => !preState);
@@ -33,11 +32,10 @@ const SearchBar = () => {
           </Col>
           <Col span={12}>
             <span>依時間搜尋：</span>
-            <OpenCalendar />
+            <OpenCalendar onChange={onDateRangeChange} />
           </Col>
         </SearchContainer>
       </Space>
-      <br />
     </StyleSearch>
   );
 };

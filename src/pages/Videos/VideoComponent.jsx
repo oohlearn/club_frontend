@@ -1,8 +1,7 @@
 import styled from "styled-components";
 import { Row, Col, Image } from "antd";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import VideoModal from "./VideoModal";
-import axios from "axios";
 
 const VideoContainer = styled.div`
   VideoModal {
@@ -12,14 +11,16 @@ const VideoContainer = styled.div`
     display: flex;
     border-radius: 10px;
   }
-  .info {
-    margin-top: 20px;
-  }
   img {
     width: 300px;
     height: auto;
   }
+  .info {
+    margin-left: 5px;
+    width: 500px;
+  }
 `;
+const InfoStyle = styled.div``;
 
 const LinkStyle = styled.a`
   text-decoration: none;
@@ -30,58 +31,39 @@ const LinkStyle = styled.a`
   h5 {
     color: black;
   }
+
   &:hover h3,
   &:hover h5 {
     color: #4096ff;
   }
 `;
 
-function VideoComponent() {
-  const [videosData, setVideosData] = useState([]);
-  const apiUrl = process.env.REACT_APP_API_URL;
-
-  const getVideosData = async () => {
-    try {
-      const response = await axios.get(`${apiUrl}information/videos/`);
-      console.log(response.data);
-      setVideosData(response.data.videos);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    getVideosData();
-  }, []);
-
+function VideoComponent({ videosData }) {
   return (
     <VideoContainer>
       {videosData.map((video) => (
-        <React.Fragment key={video.id}>
-          <Row gutter={30}>
-            <Col span={10}>
-              <VideoModal video={video} />
-            </Col>
+        <Row key={video.id}>
+          <Col span={8}>
+            <VideoModal video={video} />
+          </Col>
+          <Col className="info" span={12} push={3}>
+            <LinkStyle
+              href={video.url}
+              style={{ textDecoration: "none" }}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <h3>{video.title}</h3>
+              <h5>演出者：{video.performer}</h5>
+              <h5>
+                {video.date} - {video.place}
+              </h5>
 
-            <Col className="info" span={13} push={1}>
-              <LinkStyle
-                href={video.url}
-                style={{ textDecoration: "none" }}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <h3>{video.title}</h3>
-                <h5>演出者：{video.performer}</h5>
-                <h5>
-                  {video.date} - {video.place}
-                </h5>
-
-                <p>{video.description}</p>
-              </LinkStyle>
-            </Col>
-          </Row>
+              <p>{video.description}</p>
+            </LinkStyle>
+          </Col>
           <br />
-        </React.Fragment>
+        </Row>
       ))}
     </VideoContainer>
   );

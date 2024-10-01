@@ -8,11 +8,7 @@ import axios from "axios";
 import ProductComponent from "./ProductComponent";
 import { useProductCart } from "../../context/ProductCartContext";
 
-const StylePagination = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-top: 35px;
-`;
+const apiUrl = process.env.REACT_APP_API_URL;
 
 const StyleSearch = styled.div`
   display: flex;
@@ -82,24 +78,37 @@ const CategorySearchBar = () => {
     </Space>
   );
 };
+
 // TODO整理商品頁面
 function Shop() {
   const [productsData, setProductsData] = useState([]);
-  const apiUrl = process.env.REACT_APP_API_URL;
   const { cartItems, removeFromCart } = useProductCart();
+  const [pageSize, setPageSize] = useState(6); // 每頁顯示數量
+  const [loading, setLoading] = useState(true);
+  const [totalItems, setTotalItems] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const getProductsData = async () => {
+  const getProductsData = async (page, size) => {
     try {
-      const response = await axios.get(`${apiUrl}shopping/products/`);
+      const response = await axios.get(
+        `${apiUrl}shopping/products/?page=${page}&page_size=${size}`
+      );
       console.log(response.data);
       setProductsData(response.data.products);
+      setTotalItems(response.data.total); // 假設 API 返回總項目
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false); // 数据加载完成后或请求出错后设置 loading 为 false
     }
   };
+  const handlePageChange = (page, size) => {
+    setCurrentPage(page);
+    setPageSize(size);
+  };
   useEffect(() => {
-    getProductsData();
-  }, []);
+    getProductsData(currentPage, pageSize);
+  }, [currentPage, pageSize]);
 
   return (
     <>
@@ -122,9 +131,12 @@ function Shop() {
           <CartDrawer cartItems={cartItems} removeFromCart={removeFromCart} />
         </Col>
       </Row>
-      <StylePagination>
-        <PaginationComponent />
-      </StylePagination>
+      <PaginationComponent
+        current={currentPage}
+        pageSize={pageSize}
+        total={totalItems}
+        onChange={handlePageChange}
+      />
     </>
   );
 }

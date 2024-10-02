@@ -1,8 +1,6 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Row, Col, Button, Drawer, List, Divider, ConfigProvider } from "antd";
+import React, { useEffect, useState } from "react";
+import { Button, Drawer, List, Divider, ConfigProvider } from "antd";
 import { Link } from "react-router-dom";
-import styled from "styled-components";
-import { useProductCart } from "../../context/ProductCartContext";
 
 const CartDrawer = ({ cartItems, removeFromCart }) => {
   const [open, setOpen] = useState(false);
@@ -39,6 +37,7 @@ const CartDrawer = ({ cartItems, removeFromCart }) => {
     position: "relative",
     height: 500,
     overflow: "hidden",
+    marginTop: "10px",
   };
 
   return (

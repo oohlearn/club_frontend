@@ -25,8 +25,7 @@ const SearchContainer = styled.div`
 `;
 
 const { Search } = Input;
-const onSearch = (value, _e, info) => console.log(info?.source, value);
-const SearchBar = () => {
+const SearchBar = ({ onSearch }) => {
   return (
     <StyleSearch>
       <Search placeholder="商品名稱、關鍵字" onSearch={onSearch} enterButton />
@@ -34,45 +33,36 @@ const SearchBar = () => {
   );
 };
 
-const productsData = {
-  "服裝、配件": ["紀念T", "棒球帽", "運動襪"],
-  文具: ["譜夾", "卡套"],
-  歷年演出相關: ["DVD", "CD", "節目單"],
-  其他: ["保溫杯", "馬克杯", "帆布包"],
-};
-const categoryData = ["服裝、配件", "文具", "歷年演出相關", "其他"];
-const CategorySearchBar = () => {
-  const [category, setCategory] = useState(productsData[categoryData[0]]);
-  const [product, setProduct] = useState(productsData[categoryData[0]][0]);
-  const handleProvinceChange = (value) => {
-    setCategory(productsData[value]);
-    setProduct(productsData[value][0]);
+const CategorySearchBar = ({ onCategoryChange }) => {
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+
+  useEffect(() => {
+    // 獲取所有類別
+    axios
+      .get(`${apiUrl}shopping/products/categories/`)
+      .then((response) => {
+        setCategories(response.data);
+      })
+      .catch((error) => console.error("Error fetching categories:", error));
+  }, []);
+
+  const handleCategoryChange = (value) => {
+    setSelectedCategory(value);
+    onCategoryChange(value); // 通知父組件類別已更改
   };
-  const onSecondCityChange = (value) => {
-    setProduct(value);
-  };
+
   return (
     <Space wrap>
       <Select
-        defaultValue={categoryData[0]}
         style={{
           width: 180,
         }}
-        onChange={handleProvinceChange}
-        options={categoryData.map((province) => ({
-          label: province,
-          value: province,
-        }))}
-      />
-      <Select
-        style={{
-          width: 180,
-        }}
-        value={product}
-        onChange={onSecondCityChange}
-        options={category.map((city) => ({
-          label: city,
-          value: city,
+        value={selectedCategory}
+        onChange={handleCategoryChange}
+        options={categories.map((category) => ({
+          label: category,
+          value: category,
         }))}
       />
     </Space>
@@ -88,12 +78,20 @@ function Shop() {
   const [totalItems, setTotalItems] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const getProductsData = async (page, size) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+
+  const getProductsData = async (page, size, term = "", category = "") => {
     try {
-      const response = await axios.get(
-        `${apiUrl}shopping/products/?page=${page}&page_size=${size}`
-      );
-      console.log(response.data);
+      let url = `${apiUrl}shopping/products/?page=${page}&page_size=${size}`;
+      if (term) {
+        url += `&search=${encodeURIComponent(term)}`;
+      }
+      if (category) {
+        url += `&category=${encodeURIComponent(category)}`;
+      }
+      const response = await axios.get(url);
+      console.log({ url });
       setProductsData(response.data.products);
       setTotalItems(response.data.total); // 假設 API 返回總項目
     } catch (error) {
@@ -106,19 +104,29 @@ function Shop() {
     setCurrentPage(page);
     setPageSize(size);
   };
+
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+  };
+
+  const handleCategoryChange = (category) => {
+    setSelectedCategory(category);
+    setCurrentPage(1); // 重置頁碼
+  };
   useEffect(() => {
-    getProductsData(currentPage, pageSize);
-  }, [currentPage, pageSize]);
+    getProductsData(currentPage, pageSize, searchTerm, selectedCategory);
+  }, [currentPage, pageSize, searchTerm, selectedCategory]);
 
   return (
     <>
       <TitleComponent label="周邊商品" />
       <Row gutter={20} justify={"center"}>
-        <CategorySearchBar />
+        <CategorySearchBar onCategoryChange={handleCategoryChange} />
       </Row>
       <br />
       <Row justify={"center"}>
-        <SearchBar />
+        <SearchBar onSearch={handleSearch} />
       </Row>
       <br />
 

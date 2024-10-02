@@ -38,7 +38,6 @@ function News() {
       const sortedData = response.data.articles.sort((a, b) => new Date(b.date) - new Date(a.date));
       setNewsData(sortedData);
       setTotalItems(response.data.total); // 假設 API 返回總項目
-      console.log({ url });
     } catch (error) {
       console.log(error);
     } finally {

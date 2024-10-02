@@ -19,11 +19,24 @@ function Albums() {
 
   const [albumsData, setAlbumsData] = useState([]);
 
-  const getAlbumsData = async (page, size) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [dateRange, setDateRange] = useState([null, null]);
+
+  const getAlbumsData = async (page, size, term = "", startDate = null, endDate = null) => {
     try {
-      const response = await axios.get(
-        `${apiUrl}information/albums/?page=${page}&page_size=${size}`
-      );
+      let url = `${apiUrl}information/albums/?page=${page}&page_size=${size}`;
+      if (term) {
+        url += `&search=${encodeURIComponent(term)}`;
+      }
+      // 檢查 startDate 和 endDate，並確保它們是 moment 對象或字符串
+      if (startDate) {
+        url += `&start_date=${startDate.format("YYYY-MM-DD")}`;
+      }
+
+      if (endDate) {
+        url += `&end_date=${endDate.format("YYYY-MM-DD")}`;
+      }
+      const response = await axios.get(url);
       const sortedData = response.data.albums.sort((a, b) => new Date(b.date) - new Date(a.date));
       setAlbumsData(sortedData);
       setTotalItems(response.data.total); // 假設 API 返回總項目
@@ -40,15 +53,25 @@ function Albums() {
     setPageSize(size);
   };
 
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+  };
+
+  const handleDateRangeChange = (dates) => {
+    setDateRange(dates);
+    setCurrentPage(1);
+  };
+
   useEffect(() => {
-    getAlbumsData(currentPage, pageSize);
-  }, [currentPage, pageSize]);
+    getAlbumsData(currentPage, pageSize, searchTerm, dateRange[0], dateRange[1]);
+  }, [currentPage, pageSize, searchTerm, dateRange[0], dateRange[1]]);
 
   return (
     <>
       <TitleComponent label={"活動紀錄"} />
       <Space direction="vertical" size="large">
-        <SearchBar />
+        <SearchBar onSearch={handleSearch} onDateRangeChange={handleDateRangeChange} />
         <Row>
           <AlbumsComponent albumsData={albumsData} loading={loading} />
         </Row>

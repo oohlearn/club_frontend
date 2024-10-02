@@ -15,9 +15,24 @@ function Activities() {
   const [totalItems, setTotalItems] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const getActivitiesData = async (page, size) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [dateRange, setDateRange] = useState([null, null]);
+
+  const getActivitiesData = async (page, size, term = "", startDate = null, endDate = null) => {
     try {
-      const response = await axios.get(`${apiUrl}activity/events/?page=${page}&page_size=${size}`);
+      let url = `${apiUrl}activity/events/?page=${page}&page_size=${size}`;
+      if (term) {
+        url += `&search=${encodeURIComponent(term)}`;
+      }
+      // 檢查 startDate 和 endDate，並確保它們是 moment 對象或字符串
+      if (startDate) {
+        url += `&start_date=${startDate.format("YYYY-MM-DD")}`;
+      }
+
+      if (endDate) {
+        url += `&end_date=${endDate.format("YYYY-MM-DD")}`;
+      }
+      const response = await axios.get(url);
       setEventsData(response.data.events);
       setTotalItems(response.data.total); // 假設 API 返回總項目
       console.log(response.data.events);
@@ -31,17 +46,26 @@ function Activities() {
     setCurrentPage(page);
     setPageSize(size);
   };
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+  };
 
+  const handleDateRangeChange = (dates) => {
+    setDateRange(dates);
+    setCurrentPage(1);
+  };
   useEffect(() => {
-    getActivitiesData(currentPage, pageSize);
-  }, [currentPage, pageSize]);
+    getActivitiesData(currentPage, pageSize, searchTerm, dateRange[0], dateRange[1]);
+  }, [currentPage, pageSize, searchTerm, dateRange[0], dateRange[1]]);
 
   return (
     <>
       <TitleComponent label="近期活動" />
 
       <Space direction="vertical" size="large">
-        <SearchBar />
+        <SearchBar onSearch={handleSearch} onDateRangeChange={handleDateRangeChange} />
+
         <Row>
           <ActivityComponent eventData={eventData} />
         </Row>

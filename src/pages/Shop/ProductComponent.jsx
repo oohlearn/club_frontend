@@ -1,20 +1,9 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  Card,
-  Col,
-  ConfigProvider,
-  Row,
-  Select,
-  message,
-  Space,
-  Flex,
-  Divider,
-  Button,
-  Image,
-} from "antd";
+import { Card, Col, ConfigProvider, Row, message, Image } from "antd";
 import styled from "styled-components";
 import AddToCartModal from "./AddToCartModal.jsx";
+
 const ListStyle = styled.div`
   .link {
     text-decoration: none;
@@ -42,6 +31,7 @@ const CartIconStyled = styled.div`
 function OpenAddModal({ productData }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+
   const showLoading = () => {
     setOpen(true);
     setLoading(true);
@@ -54,6 +44,7 @@ function OpenAddModal({ productData }) {
     setOpen(false);
     message.success("成功加入購物車！");
   };
+
   return (
     <CartIconStyled>
       <div
@@ -103,7 +94,7 @@ function ProductComponent({ productsData }) {
             <ConfigProvider
               theme={{
                 token: {
-                  paddingLG: 10,
+                  paddingLG: 5,
                   borderRadius: 0,
                 },
               }}
@@ -133,7 +124,7 @@ function ProductComponent({ productsData }) {
                 <Link className="link" to={`/shop/${productData.id}`}>
                   <Row>
                     <Col span={18}>
-                      <Meta title={<h6 className="title">{productData.title}</h6>} />
+                      <Meta title={<h6 className="title">{productData.name}</h6>} />
                       <Meta description={<h6>NT${productData.price}</h6>} />
                     </Col>
                     <Col span={6}>詳情</Col>
